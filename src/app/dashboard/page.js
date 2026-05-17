@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import Particles from "../components/ui/Particle";
 import Sidebar from "../components/Sidebar";
+import TopNav from "../components/TopNav";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard",   href: "/dashboard",   active: true },
@@ -31,6 +32,7 @@ const days = ["M", "T", "W", "T", "F", "S", "S"];
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileTab, setMobileTab]     = useState("map"); // "map" | "stats"
 
   const [activeLevel, setActiveLevel] = useState(
@@ -92,50 +94,12 @@ export default function DashboardPage() {
       <div className="relative z-10 h-screen text-slate-100 flex overflow-hidden font-sans">
 
         {/* ════════ SIDEBAR ════════ */}
-        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        {/* Sidebar overlay */}
-        {sidebarOpen && (
-          <div className="fixed inset-0 z-40 bg-black/60 lg:hidden" onClick={() => setSidebarOpen(false)} />
-        )}
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(p => !p)} />
 
         {/* ════════ MAIN ════════ */}
         <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
 
-          {/* ── Topbar ── */}
-          <header className="shrink-0 z-30 bg-[#080c18]/90 backdrop-blur border-b border-indigo-500/20 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              {/* Hamburger */}
-              <button
-                className="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/5 transition shrink-0"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-              <div className="min-w-0">
-                <h1 className="text-sm sm:text-base font-bold">Dashboard</h1>
-                <p className="text-xs text-slate-400 hidden sm:block">Welcome back, John 👋</p>
-              </div>
-            </div>
-
-            {/* Mobile tab switcher — hidden on lg+ */}
-            <div className="flex lg:hidden items-center gap-1 bg-[#0d1225] rounded-xl p-1 border border-indigo-500/20 shrink-0">
-              <button
-                onClick={() => setMobileTab("map")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${mobileTab === "map" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-white"}`}
-              >Map</button>
-              <button
-                onClick={() => setMobileTab("stats")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${mobileTab === "stats" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-white"}`}
-              >Stats</button>
-            </div>
-
-            <Link href="/practice"
-              className="shrink-0 px-3 sm:px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs sm:text-sm font-semibold hover:bg-indigo-500 transition shadow-[0_0_20px_rgba(99,102,241,0.35)]">
-              Practice Now
-            </Link>
-          </header>
+          <TopNav onMenuClick={() => setSidebarOpen(true)} />
 
           {/* ── Body ── */}
           <div className="flex-1 flex overflow-hidden">

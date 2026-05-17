@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Particles from "../components/ui/Particle";
+import TopNav from "../components/TopNav";
 import {
   Flame, TrendingUp, Shield, Swords, FlaskConical,
   Flag, ChevronLeft, ChevronRight, LayoutGrid,
@@ -25,12 +26,12 @@ function RankIcon() {
 function CubeBadge() {
   return (
     <div className="relative flex items-center justify-center w-28 h-28">
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-green-500/10 to-emerald-900/20" />
+      <div className="absolute inset-0 rounded-xl bg-linear-to-br from-green-500/10 to-emerald-900/20" />
       <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
         <polygon points="50,3 95,27 95,73 50,97 5,73 5,27" fill="none" stroke="#4ade80" strokeWidth="1.2" opacity="0.35" />
         <polygon points="50,10 88,31 88,69 50,90 12,69 12,31" fill="none" stroke="#22c55e" strokeWidth="0.8" opacity="0.2" />
       </svg>
-      <div className="relative z-10 w-12 h-12 rounded-lg bg-gradient-to-br from-green-400/20 to-green-900/40 border border-green-400/40 flex items-center justify-center shadow-[0_0_16px_rgba(74,222,128,0.4)]">
+      <div className="relative z-10 w-12 h-12 rounded-lg bg-linear-to-br from-green-400/20 to-green-900/40 border border-green-400/40 flex items-center justify-center shadow-[0_0_16px_rgba(74,222,128,0.4)]">
         <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="#4ade80" strokeWidth="1.5">
           <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
           <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
@@ -60,6 +61,7 @@ const TABS = ["Profile", "Activity", "Badges", "Published Content"];
 
 export default function AnalyticsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState("Profile");
   const [chartFilter, setChartFilter] = useState("1M");
 
@@ -72,30 +74,21 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="relative z-10 h-screen text-slate-100 flex overflow-hidden font-sans">
-        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(p => !p)} />
 
         <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
 
-          {/* Topbar */}
-          <header className="shrink-0 z-30 bg-[#080c18]/90 backdrop-blur border-b border-white/5 px-4 sm:px-6 py-3.5 flex items-center gap-3">
-            <button className="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/5 transition"
-              onClick={() => setSidebarOpen(true)}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <h1 className="text-sm font-bold">Analytics</h1>
-          </header>
+          <TopNav onMenuClick={() => setSidebarOpen(true)} />
 
           {/* Page body */}
           <div className="flex-1 overflow-y-auto scrollbar-hide bg-[#080c18]">
             <div className="max-w-6xl mx-auto px-4 py-5">
 
               {/* Tabs */}
-              <div className="flex gap-0 border-b border-white/5 mb-5">
+              <div className="flex gap-0 border-b border-white/5 mb-5 overflow-x-auto scrollbar-hide">
                 {TABS.map(tab => (
                   <button key={tab} onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-2.5 text-xs font-semibold transition-all relative
+                    className={`shrink-0 px-4 py-2.5 text-xs font-semibold transition-all relative
                       ${activeTab === tab ? "text-white" : "text-slate-500 hover:text-slate-300"}`}>
                     {tab}
                     {activeTab === tab && (
@@ -106,13 +99,13 @@ export default function AnalyticsPage() {
               </div>
 
               {/* Two-column layout */}
-              <div className="flex gap-4 items-start">
+              <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-start">
 
                 {/* ══ LEFT / MAIN CONTENT ══ */}
-                <div className="flex-1 min-w-0 space-y-3">
+                <div className="w-full flex-1 min-w-0 space-y-3">
 
                   {/* Card A + Card B side by side */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
                     {/* Card A: Rank icon + Lvl + XP bar + Beginner + Grade */}
                     <div className="rounded-xl bg-[#0d1225] border border-white/5 overflow-hidden flex flex-col">
@@ -138,7 +131,7 @@ export default function AnalyticsPage() {
                           <span>0/150</span>
                         </div>
                         <div className="h-1.5 bg-[#1a2035] rounded-full overflow-hidden">
-                          <div className="h-full w-[2%] rounded-full bg-gradient-to-r from-green-500 to-green-400" />
+                          <div className="h-full w-[2%] rounded-full bg-linear-to-r from-green-500 to-green-400" />
                         </div>
                       </div>
                       {/* Beginner + Grade */}
@@ -190,7 +183,7 @@ export default function AnalyticsPage() {
                   </div>
 
                   {/* Top 3 counters */}
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {[
                       { icon: LayoutGrid, label: "Machines",   done: 0, total: 528 },
                       { icon: Shield,     label: "Sherlocks",  done: 0, total: 149 },
@@ -210,9 +203,9 @@ export default function AnalyticsPage() {
                   </div>
 
                   {/* Charts row */}
-                  <div className="grid grid-cols-5 gap-3">
+                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
                     {/* Bar chart */}
-                    <div className="col-span-3 rounded-xl bg-[#0d1225] border border-white/5 p-4">
+                    <div className="lg:col-span-3 rounded-xl bg-[#0d1225] border border-white/5 p-4">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-xs font-semibold text-slate-200">Machines Completed</span>
                         <div className="relative flex items-center gap-1 bg-[#080c18] border border-white/10 rounded-lg px-2 py-1 cursor-pointer">
@@ -241,16 +234,16 @@ export default function AnalyticsPage() {
                       </div>
                     </div>
                     {/* Concentric chart */}
-                    <div className="col-span-2 rounded-xl bg-[#0d1225] border border-white/5 p-4">
+                    <div className="lg:col-span-2 rounded-xl bg-[#0d1225] border border-white/5 p-4">
                       <div className="text-xs font-semibold text-slate-200 mb-2">Difficulty Completion</div>
-                      <div className="w-full aspect-square max-w-[120px] mx-auto">
+                      <div className="w-full aspect-square max-w-30 mx-auto">
                         <ConcentricChart />
                       </div>
                     </div>
                   </div>
 
                   {/* Bottom 3 counters */}
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {[
                       { icon: FlaskConical, label: "Pro Labs",      done: 0, total: 11 },
                       { icon: TrendingUp,   label: "Mini Pro Labs", done: 0, total: 22 },
@@ -272,7 +265,7 @@ export default function AnalyticsPage() {
                 </div>
 
                 {/* ══ RIGHT SIDEBAR ══ */}
-                <div className="w-52 shrink-0 space-y-3">
+                <div className="w-full lg:w-52 shrink-0 space-y-3">
 
                   <div className="rounded-xl bg-[#0d1225] border border-white/5 p-4">
                     <div className="text-xs font-bold text-slate-200 mb-2">Weekly Streak</div>

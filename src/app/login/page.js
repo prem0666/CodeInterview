@@ -18,11 +18,11 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-bold text-lg mb-8 justify-center">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 shadow-[0_0_20px_rgba(99,102,241,0.4)]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-cyan-400 shadow-[0_0_20px_rgba(99,102,241,0.4)]">
             <Code2 className="h-5 w-5 text-white" />
           </div>
           CodeInterview{" "}
-          <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Pro</span>
+          <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Pro</span>
         </Link>
 
         {/* Card */}
@@ -96,7 +96,7 @@ export default function LoginPage() {
           </div>
 
           <p className="text-center text-sm text-slate-400 mt-6">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="text-indigo-400 hover:text-indigo-300 font-semibold transition">Sign up</Link>
           </p>
         </div>

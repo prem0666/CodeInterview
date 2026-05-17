@@ -10,18 +10,18 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-slate-100 flex items-center justify-center px-4 relative overflow-hidden">
       {/* Grid bg */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.06)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.06)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none" />
       <div className="absolute w-96 h-96 -top-20 -right-20 bg-indigo-600 opacity-10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute w-72 h-72 bottom-0 left-0 bg-cyan-500 opacity-10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-bold text-lg mb-8 justify-center">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 shadow-[0_0_20px_rgba(99,102,241,0.4)]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-cyan-400 shadow-[0_0_20px_rgba(99,102,241,0.4)]">
             <Code2 className="h-5 w-5 text-white" />
           </div>
           CodeInterview{" "}
-          <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Pro</span>
+          <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Pro</span>
         </Link>
 
         {/* Card */}

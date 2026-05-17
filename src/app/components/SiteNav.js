@@ -32,7 +32,7 @@ export function SiteNav() {
           <Link href="/login" className="text-sm font-semibold px-5 py-2 rounded-lg border border-indigo-500/20 text-slate-100 hover:border-indigo-500 hover:bg-indigo-500/10 transition">
             Login
           </Link>
-          <Link href="/register" className="text-sm font-semibold px-5 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-cyan-400 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:opacity-90 transition">
+          <Link href="/register" className="text-sm font-semibold px-5 py-2 rounded-lg bg-linear-to-r from-indigo-500 to-cyan-400 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:opacity-90 transition">
             Get Started
           </Link>
         </div>
@@ -52,7 +52,7 @@ export function SiteNav() {
           <a href="#docs" onClick={() => setMenuOpen(false)}>Docs</a>
           <div className="flex gap-3 pt-2">
             <Link href="/login" className="text-sm font-semibold px-5 py-2 rounded-lg border border-indigo-500/20 text-slate-100">Login</Link>
-            <Link href="/register" className="text-sm font-semibold px-5 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-cyan-400 text-white">Get Started</Link>
+            <Link href="/register" className="text-sm font-semibold px-5 py-2 rounded-lg bg-linear-to-r from-indigo-500 to-cyan-400 text-white">Get Started</Link>
           </div>
         </div>
       )}

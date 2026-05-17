@@ -214,15 +214,15 @@ export default function LandingPage() {
                 <span className="text-white"> skills </span>
                 <span className="text-slate-400">=</span>
                 <span className="text-white"> [</span>
-                <span className="text-green-400">'React'</span>
+                <span className="text-green-400">&apos;React&apos;</span>
                 <span className="text-white">, </span>
-                <span className="text-green-400">'Next.js'</span>
+                <span className="text-green-400">&apos;Next.js&apos;</span>
                 <span className="text-white">,</span>
                 {`
     `}
-                <span className="text-green-400">'Node.js'</span>
+                <span className="text-green-400">&apos;Node.js&apos;</span>
                 <span className="text-white">, </span>
-                <span className="text-green-400">'MongoDB'</span>
+                <span className="text-green-400">&apos;MongoDB&apos;</span>
                 <span className="text-white">];</span>
                 {`
 
@@ -234,7 +234,7 @@ export default function LandingPage() {
                 <span className="text-slate-400">&lt;</span>
                 <span className="text-cyan-300">div</span>
                 <span className="text-yellow-300"> className</span>
-                <span className="text-slate-400">="hero"&gt;</span>
+                <span className="text-slate-400">=&quot;hero&quot;&gt;</span>
                 {`
       `}
                 <span className="text-slate-400">&lt;</span>
@@ -276,19 +276,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── STATS ── */}
-      <section className="bg-[#0f1629] border-t border-b border-indigo-500/20">
-        <div className="max-w-5xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {stats.map((s) => (
-            <div key={s.label}>
-              <div className="text-4xl font-extrabold bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                {s.value}
-              </div>
-              <div className="text-sm mt-1 text-slate-400">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+     
+     
 
       {/* ── FEATURES ── */}
       <section id="features" className="max-w-6xl mx-auto px-6 py-24">
@@ -298,7 +287,7 @@ export default function LandingPage() {
           </span>
           <h2 className="text-4xl font-extrabold mb-3">
             Everything you need to{" "}
-            <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
               get hired
             </span>
           </h2>
@@ -330,9 +319,9 @@ export default function LandingPage() {
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                   style={{ background: `radial-gradient(circle at 30% 30%, ${glows[i]} 0%, transparent 60%)` }} />
                 {/* Top accent line */}
-                <div className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${gradients[i]} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                <div className={`absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r ${gradients[i]} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                 <div className="relative">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-br ${gradients[i]}`}
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 bg-linear-to-br ${gradients[i]}`}
                     style={{ boxShadow: `0 0 20px ${glows[i]}` }}>
                     <Icon className="w-5 h-5 text-white" />
                   </div>
@@ -351,31 +340,79 @@ export default function LandingPage() {
       {/* ── HOW IT WORKS ── */}
       <section
         id="how"
-        className="bg-[#0f1629] border-t border-b border-indigo-500/20"
+        className="relative overflow-hidden bg-[#072f3d] border-t border-b border-indigo-500/15"
       >
-        <div className="max-w-5xl mx-auto px-6 py-24">
-          <div className="text-center mb-14">
-            <h2 className="text-4xl font-extrabold mb-3">
-              How it{" "}
-              <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                works
+        {/* Ambient glows */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-24 -left-24 w-125 h-125 bg-cyan-400/15 rounded-full blur-[120px]" />
+          <div className="absolute -bottom-28 -right-28 w-125 h-125 bg-indigo-500/15 rounded-full blur-[120px]" />
+        </div>
+
+        <div className="relative max-w-6xl mx-auto px-6 py-24">
+          <div className="max-w-3xl">
+            <div className="text-xs font-semibold tracking-widest text-slate-200/60">
+              STEP
+            </div>
+            <h2 className="mt-4 text-4xl sm:text-5xl font-extrabold leading-[1.1] tracking-tight">
+              From zero to offer{" "}
+              <span className="bg-linear-to-r from-indigo-300 to-cyan-200 bg-clip-text text-transparent">
+                in four simple steps.
               </span>
             </h2>
-            <p className="text-slate-400">
-              From zero to offer in 4 simple steps.
+            <p className="mt-5 text-base leading-relaxed text-slate-200/70 max-w-2xl">
+              Pick a topic, solve in the IDE, get AI feedback, and track progress
+              until you land the job.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((s) => (
-              <div key={s.step} className="text-center">
-                <div className="text-5xl font-extrabold bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent mb-4">
-                  {s.step}
-                </div>
-                <h3 className="font-bold text-lg mb-2">{s.title}</h3>
-                <p className="text-sm text-slate-400">{s.desc}</p>
-              </div>
-            ))}
-          </div>
+
+          <ol className="mt-12 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+            {steps.map((s, i) => {
+              const accents = [
+                "from-cyan-300 to-indigo-300",
+                "from-indigo-300 to-violet-300",
+                "from-violet-300 to-fuchsia-300",
+                "from-emerald-300 to-cyan-300",
+              ];
+              const glow = [
+                "rgba(34,211,238,0.22)",
+                "rgba(99,102,241,0.22)",
+                "rgba(217,70,239,0.22)",
+                "rgba(16,185,129,0.22)",
+              ];
+              const stepNum = String(Number.parseInt(s.step, 10));
+
+              return (
+                <li
+                  key={s.step}
+                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-7 backdrop-blur-sm shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_24px_60px_rgba(0,0,0,0.35)] transition-transform duration-300 hover:-translate-y-1"
+                >
+                  <div
+                    className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    style={{
+                      background: `radial-gradient(circle at 30% 25%, ${glow[i]} 0%, transparent 60%)`,
+                    }}
+                  />
+                  <div className={`pointer-events-none absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r ${accents[i]} opacity-60`} />
+
+                  <div
+                    aria-hidden="true"
+                    className={`pointer-events-none absolute -top-8 -left-1 text-[128px] font-extrabold leading-none tracking-tighter text-transparent bg-clip-text bg-linear-to-br ${accents[i]} opacity-25`}
+                  >
+                    {stepNum}
+                  </div>
+
+                  <div className="relative pt-14">
+                    <h3 className="text-lg font-bold text-slate-100 mb-2">
+                      {s.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-slate-200/70">
+                      {s.desc}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </section>
 
@@ -476,7 +513,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <p className="text-sm leading-relaxed text-slate-400">
-                  "{t.text}"
+                  &quot;{t.text}&quot;
                 </p>
                 <div>
                   <div className="font-bold text-sm">{t.name}</div>
