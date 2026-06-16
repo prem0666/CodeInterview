@@ -27,13 +27,14 @@ export async function GET(request, { params }) {
       controller.enqueue(encode(encoder, { type: "hello", clientId, peers: listPeers(roomCode, clientId) }));
       broadcastRoom(roomCode, { type: "peer-join", peerId: clientId }, clientId);
 
+      // ping every 5s — keeps Cloudflare/ngrok/localtunnel from closing idle SSE
       pingTimer = setInterval(() => {
         try {
           controller.enqueue(encoder.encode(`: ping ${Date.now()}\n\n`));
         } catch {
           // ignore
         }
-      }, 15000);
+      }, 5000);
 
       request.signal.addEventListener("abort", () => {
         if (closed) return;
@@ -59,9 +60,13 @@ export async function GET(request, { params }) {
 
   return new Response(stream, {
     headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-store, no-transform",
+      "Connection": "keep-alive",
+      // Cloudflare / nginx: disable response buffering
+      "X-Accel-Buffering": "no",
+      // Cloudflare zero-RTT & cache bypass
+      "CF-Cache-Status": "BYPASS",
     },
   });
 }

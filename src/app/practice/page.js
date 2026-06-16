@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Search, CheckCircle, Hash } from "lucide-react";
 import Sidebar from "../components/Sidebar";
-import { PROBLEMS, LEVELS } from "../lib/data";
+import { PROBLEMS, LEVELS  } from "../lib/data";
 import Image from "next/image";
 
 // ── Difficulty bar (HTB style) ──
@@ -215,8 +215,8 @@ export default function PracticePage() {
           <div className="px-6 sm:px-8 py-4 flex items-center gap-3 border-b border-white/5">
             <span className="text-xs text-slate-500 shrink-0">Difficulty:</span>
             <div className="flex gap-2 flex-wrap">
-              {DIFFS.map(d => (
-                <button key={d} onClick={() => setDiff(d)}
+              {DIFFS.map((d , index) => (
+                <button key={index} onClick={() => setDiff(d)}
                   className={`px-3 py-1 rounded-full text-xs font-semibold transition-all border ${
                     diff === d
                       ? d === "Easy"   ? "bg-green-400/15 text-green-400 border-green-400/40"
@@ -251,8 +251,8 @@ export default function PracticePage() {
               {filtered.length === 0 ? (
                 <div className="py-20 text-center text-slate-600 text-sm">No problems found</div>
               ) : (
-                filtered.map(p => (
-                  <Link key={p.id} href={`/practice/${p.id}`}
+                filtered.map((p , index) => (
+                  <Link key={index} href={`/practice/${p.id}`}
                     className="grid items-center gap-4 px-4 py-3.5 rounded-xl bg-[#13161f] border border-white/4 hover:bg-[#1a1d2e] hover:border-indigo-500/20 transition-all group cursor-pointer"
                     style={{ gridTemplateColumns: "2.5rem 1fr 160px 100px 80px 80px 90px" }}>
 

@@ -1,313 +1,591 @@
 // ── Shared data ──
 
-export const LEVELS = [
+const ROADMAP = [
   {
-    level: 11,
-    label: "Arrays",
+    level: 1,
+    label: "Programming Basics",
     completed: true,
-    color: "34,211,238",
-    secondary: "8,145,178",
-    desc: "Foundation of DSA — learn how to manipulate arrays efficiently.Foundation of DSA — learn how to manipulate arrays efficiently.Foundation of DSA — learn how to manipulate arrays efficiently.Foundation of DSA — learn how to manipulate arrays efficiently.Foundation of DSA  ",
-    topics: [
-      "Two Pointers",
-      "Sliding Window",
-      "Prefix Sum",
-      "Kadane's Algorithm",
-    ],
+    color: "59,130,246",
+    secondary: "37,99,235",
+    desc: "Master the fundamentals of programming including variables, loops, conditions, and functions.",
+    topics: ["Variables", "Data Types", "Operators", "Loops", "Functions"],
     theory: [
       {
-        title: "What is an Array?",
-        body: "Contiguous memory block. O(1) access by index.",
+        title: "Variables",
+        body: "Variables are used to store values in memory.",
       },
       {
-        title: "Two Pointer Technique",
-        body: "Use two indices moving toward each other to solve problems in O(n).",
-      },
-      {
-        title: "Sliding Window",
-        body: "Maintain a window of elements to avoid nested loops.",
-      },
-      {
-        title: "Prefix Sum",
-        body: "Precompute cumulative sums for O(1) range queries.",
+        title: "Loops",
+        body: "Loops allow repeating a block of code multiple times.",
       },
     ],
-    problemIds: [1, 2, 3, 4, 5],
+    problems: [
+      {
+        id: 1,
+        title: "Fizz Buzz",
+        difficulty: "Easy",
+        topic: "Programming Basics",
+        solved: false,
+        acceptance: 23.2,
+        xp: 50,
+        tags: ["Math", "Simulation"],
+        companies: ["Amazon", "Google"],
+        desc: "Given an integer n, return a string representation of numbers from 1 to n following FizzBuzz rules.",
+        constraints: ["1 <= n <= 10^4"],
+        examples: [
+          {
+            input: "n = 3",
+            output: '["1","2","Fizz"]',
+          },
+        ],
+        hints: ["Use modulo operator.", "Check 15 before 3 and 5."],
+        starter: `function fizzBuzz(n) {
+  // Write your code here
+}`,
+      },
+    ],
   },
   {
-    level: 12,
-    label: "Recursion",
+    level: 2,
+    label: "Programming Basics",
     completed: true,
-    color: "52,211,153",
-    secondary: "5,150,105",
-    desc: "Master the art of breaking problems into smaller subproblems.",
-    topics: ["Base Cases", "Call Stack", "Backtracking", "Memoization"],
+    // active: true,
+    color: "59,130,246",
+    secondary: "37,99,235",
+    desc: "Master the fundamentals of programming including variables, loops, conditions, and functions.",
+    topics: ["Variables", "Data Types", "Operators", "Loops", "Functions"],
     theory: [
       {
-        title: "What is Recursion?",
-        body: "A function calling itself with a smaller input until a base case.",
+        title: "Variables",
+        body: "Variables are used to store values in memory.",
       },
       {
-        title: "Base Case",
-        body: "The condition that stops recursion. Always define it first.",
-      },
-      {
-        title: "Call Stack",
-        body: "Each recursive call adds a frame. Stack overflow if too deep.",
-      },
-      {
-        title: "Backtracking",
-        body: "Try all possibilities, undo bad choices and try next.",
+        title: "Loops",
+        body: "Loops allow repeating a block of code multiple times.",
       },
     ],
-    problemIds: [6, 7, 8, 9, 10],
+    problems: [
+      {
+        id: 1,
+        title: "Fizz Buzz",
+        difficulty: "Easy",
+        topic: "Programming Basics",
+        solved: false,
+        acceptance: 73.2,
+        xp: 50,
+        tags: ["Math", "Simulation"],
+        companies: ["Amazon", "Google"],
+        desc: "Given an integer n, return a string representation of numbers from 1 to n following FizzBuzz rules.",
+        constraints: ["1 <= n <= 10^4"],
+        examples: [
+          {
+            input: "n = 3",
+            output: '["1","2","Fizz"]',
+          },
+        ],
+        hints: ["Use modulo operator.", "Check 15 before 3 and 5."],
+        starter: `function fizzBuzz(n) {
+  // Write your code here
+}`,
+      },
+    ],
   },
   {
-    level: 13,
-    label: "Binary Trees",
+    level: 3,
+    label: "Programming Basics",
+    completed: true,
+    // locked: true,
+    color: "59,130,246",
+    secondary: "37,99,235",
+    desc: "Master the fundamentals of programming including variables, loops, conditions, and functions.",
+    topics: ["Variables", "Data Types", "Operators", "Loops", "Functions"],
+    theory: [
+      {
+        title: "Variables",
+        body: "Variables are used to store values in memory.",
+      },
+      {
+        title: "Loops",
+        body: "Loops allow repeating a block of code multiple times.",
+      },
+    ],
+    problems: [
+      {
+        id: 1,
+        title: "Fizz Buzz",
+        difficulty: "Easy",
+        topic: "Programming Basics",
+        solved: false,
+        acceptance: 73.2,
+        xp: 50,
+        tags: ["Math", "Simulation"],
+        companies: ["Amazon", "Google"],
+        desc: "Given an integer n, return a string representation of numbers from 1 to n following FizzBuzz rules.",
+        constraints: ["1 <= n <= 10^4"],
+        examples: [
+          {
+            input: "n = 3",
+            output: '["1","2","Fizz"]',
+          },
+        ],
+        hints: ["Use modulo operator.", "Check 15 before 3 and 5."],
+        starter: `function fizzBuzz(n) {
+  // Write your code here
+}`,
+      },
+    ],
+  },
+  {
+    level: 4,
+    label: "Programming Basics",
+    completed: true,
+    // locked: true,
+    color: "59,130,246",
+    secondary: "37,99,235",
+    desc: "Master the fundamentals of programming including variables, loops, conditions, and functions.",
+    topics: ["Variables", "Data Types", "Operators", "Loops", "Functions"],
+    theory: [
+      {
+        title: "Variables",
+        body: "Variables are used to store values in memory.",
+      },
+      {
+        title: "Loops",
+        body: "Loops allow repeating a block of code multiple times.",
+      },
+    ],
+    problems: [
+      {
+        id: 1,
+        title: "Fizz Buzz",
+        difficulty: "Easy",
+        topic: "Programming Basics",
+        solved: false,
+        acceptance: 73.2,
+        xp: 50,
+        tags: ["Math", "Simulation"],
+        companies: ["Amazon", "Google"],
+        desc: "Given an integer n, return a string representation of numbers from 1 to n following FizzBuzz rules.",
+        constraints: ["1 <= n <= 10^4"],
+        examples: [
+          {
+            input: "n = 3",
+            output: '["1","2","Fizz"]',
+          },
+        ],
+        hints: ["Use modulo operator.", "Check 15 before 3 and 5."],
+        starter: `function fizzBuzz(n) {
+  // Write your code here
+}`,
+      },
+    ],
+  },
+  {
+    level: 5,
+    label: "Programming Basics",
+    completed: true,
+    // locked: true,
+    color: "59,130,246",
+    secondary: "37,99,235",
+    desc: "Master the fundamentals of programming including variables, loops, conditions, and functions.",
+    topics: ["Variables", "Data Types", "Operators", "Loops", "Functions"],
+    theory: [
+      {
+        title: "Variables",
+        body: "Variables are used to store values in memory.",
+      },
+      {
+        title: "Loops",
+        body: "Loops allow repeating a block of code multiple times.",
+      },
+    ],
+    problems: [
+      {
+        id: 1,
+        title: "Fizz Buzz",
+        difficulty: "Easy",
+        topic: "Programming Basics",
+        solved: false,
+        acceptance: 73.2,
+        xp: 50,
+        tags: ["Math", "Simulation"],
+        companies: ["Amazon", "Google"],
+        desc: "Given an integer n, return a string representation of numbers from 1 to n following FizzBuzz rules.",
+        constraints: ["1 <= n <= 10^4"],
+        examples: [
+          {
+            input: "n = 3",
+            output: '["1","2","Fizz"]',
+          },
+        ],
+        hints: ["Use modulo operator.", "Check 15 before 3 and 5."],
+        starter: `function fizzBuzz(n) {
+  // Write your code here
+}`,
+      },
+    ],
+  },
+  {
+    level: 6,
+    label: "Programming Basics",
+    // completed: false,
+    // locked: true,
     active: true,
-    color: "168,85,247",
-    secondary: "109,40,217",
-    desc: "Understand tree structures, traversals, and tree-based algorithms.",
-    topics: ["Inorder/Preorder/Postorder", "BFS/DFS", "BST", "Tree DP"],
+    color: "59,130,246",
+    secondary: "37,99,235",
+    desc: "Master the fundamentals of programming including variables, loops, conditions, and functions.",
+    topics: ["Variables", "Data Types", "Operators", "Loops", "Functions"],
     theory: [
       {
-        title: "Tree Basics",
-        body: "Node with left/right children. Root has no parent.",
+        title: "Variables",
+        body: "Variables are used to store values in memory.",
       },
       {
-        title: "DFS Traversals",
-        body: "Inorder (L-Root-R), Preorder (Root-L-R), Postorder (L-R-Root).",
-      },
-      {
-        title: "BFS / Level Order",
-        body: "Use a queue to visit nodes level by level.",
-      },
-      {
-        title: "Binary Search Tree",
-        body: "Left < Root < Right. O(log n) search on balanced BST.",
+        title: "Loops",
+        body: "Loops allow repeating a block of code multiple times.",
       },
     ],
-    problemIds: [11, 12, 13, 14, 15],
+    problems: [
+      {
+        id: 1,
+        title: "Fizz Buzz",
+        difficulty: "Easy",
+        topic: "Programming Basics",
+        solved: false,
+        acceptance: 73.2,
+        level: 6,
+        xp: 50,
+        tags: ["Math", "Simulation"],
+        companies: ["Amazon", "Google"],
+        desc: "Given an integer n, return a string representation of numbers from 1 to n following FizzBuzz rules.",
+        constraints: ["1 <= n <= 10^4"],
+        examples: [
+          {
+            input: "n = 3",
+            output: '["1","2","Fizz"]',
+          },
+        ],
+        hints: ["Use modulo operator.", "Check 15 before 3 and 5."],
+        starter: `function fizzBuzz(n) {
+  // Write your code here
+}`,
+      },
+    ],
   },
   {
-    level: 14,
-    label: "Level 14",
+    level: 10,
+    label: "Programming Basics",
+    completed: false,
     locked: true,
-    color: "148,163,184",
-    secondary: "71,85,105",
-    desc: "Almost there! Keep grinding.",
-    topics: [],
-    theory: [],
-    problemIds: [],
+    color: "59,130,246",
+    secondary: "37,99,235",
+    desc: "Master the fundamentals of programming including variables, loops, conditions, and functions.",
+    topics: ["Variables", "Data Types", "Operators", "Loops", "Functions"],
+    theory: [
+      {
+        title: "Variables",
+        body: "Variables are used to store values in memory.",
+      },
+      {
+        title: "Loops",
+        body: "Loops allow repeating a block of code multiple times.",
+      },
+    ],
+    problems: [
+      {
+        id: 1,
+        title: "Fizz Buzz",
+        difficulty: "Easy",
+        topic: "Programming Basics",
+        solved: false,
+        acceptance: 73.2,
+        xp: 50,
+        tags: ["Math", "Simulation"],
+        companies: ["Amazon", "Google"],
+        desc: "Given an integer n, return a string representation of numbers from 1 to n following FizzBuzz rules.",
+        constraints: ["1 <= n <= 10^4"],
+        examples: [
+          {
+            input: "n = 3",
+            output: '["1","2","Fizz"]',
+          },
+        ],
+        hints: ["Use modulo operator.", "Check 15 before 3 and 5."],
+        starter: `function fizzBuzz(n) {
+  // Write your code here
+}`,
+      },
+    ],
   },
   {
-    level: 15,
-    label: "Level 15",
+    level: 7,
+    label: "Programming Basics",
+    completed: false,
     locked: true,
-    color: "255,90,120",
-    secondary: "150,50,60",
-    desc: "Unlock after completing Level 14.",
-    topics: [],
-    theory: [],
-    problemIds: [],
+    color: "59,130,246",
+    secondary: "37,99,235",
+    desc: "Master the fundamentals of programming including variables, loops, conditions, and functions.",
+    topics: ["Variables", "Data Types", "Operators", "Loops", "Functions"],
+    theory: [
+      {
+        title: "Variables",
+        body: "Variables are used to store values in memory.",
+      },
+      {
+        title: "Loops",
+        body: "Loops allow repeating a block of code multiple times.",
+      },
+    ],
+    problems: [
+      {
+        id: 1,
+        title: "Fizz Buzz",
+        difficulty: "Easy",
+        topic: "Programming Basics",
+        solved: false,
+        acceptance: 73.2,
+        xp: 50,
+        tags: ["Math", "Simulation"],
+        companies: ["Amazon", "Google"],
+        desc: "Given an integer n, return a string representation of numbers from 1 to n following FizzBuzz rules.",
+        constraints: ["1 <= n <= 10^4"],
+        examples: [
+          {
+            input: "n = 3",
+            output: '["1","2","Fizz"]',
+          },
+        ],
+        hints: ["Use modulo operator.", "Check 15 before 3 and 5."],
+        starter: `function fizzBuzz(n) {
+  // Write your code here
+}`,
+      },
+    ],
   },
-];
+   {
+    level: 8,
+    label: "Programming Basics",
+    completed: false,
+    locked:true,
+    color: "59,130,246",
+    secondary: "37,99,235",
+    desc: "Master the fundamentals of programming including variables, loops, conditions, and functions.",
+    topics: [
+      "Variables",
+      "Data Types",
+      "Operators",
+      "Loops",
+      "Functions"
+    ],
+    theory: [
+      {
+        title: "Variables",
+        body: "Variables are used to store values in memory."
+      },
+      {
+        title: "Loops",
+        body: "Loops allow repeating a block of code multiple times."
+      }
+    ],
+    problems: [
+      {
+        id: 1,
+        title: "Fizz Buzz",
+        difficulty: "Easy",
+        topic: "Programming Basics",
+        solved: false,
+        acceptance: 73.2,
+        xp: 50,
+        tags: ["Math", "Simulation"],
+        companies: ["Amazon", "Google"],
+        desc: "Given an integer n, return a string representation of numbers from 1 to n following FizzBuzz rules.",
+        constraints: [
+          "1 <= n <= 10^4"
+        ],
+        examples: [
+          {
+            input: "n = 3",
+            output: "[\"1\",\"2\",\"Fizz\"]"
+          }
+        ],
+        hints: [
+          "Use modulo operator.",
+          "Check 15 before 3 and 5."
+        ],
+        starter: `function fizzBuzz(n) {
+  // Write your code here
+}`
+      }
+    ]
+  },
+   {
+    level: 11,
+    label: "Programming Basics",
+    completed: false,
+    locked:true,
+    color: "59,130,246",
+    secondary: "37,99,235",
+    desc: "Master the fundamentals of programming including variables, loops, conditions, and functions.",
+    topics: [
+      "Variables",
+      "Data Types",
+      "Operators",
+      "Loops",
+      "Functions"
+    ],
+    theory: [
+      {
+        title: "Variables",
+        body: "Variables are used to store values in memory."
+      },
+      {
+        title: "Loops",
+        body: "Loops allow repeating a block of code multiple times."
+      }
+    ],
+    problems: [
+      {
+        id: 1,
+        title: "Fizz Buzz",
+        difficulty: "Easy",
+        topic: "Programming Basics",
+        solved: false,
+        acceptance: 73.2,
+        xp: 50,
+        tags: ["Math", "Simulation"],
+        companies: ["Amazon", "Google"],
+        desc: "Given an integer n, return a string representation of numbers from 1 to n following FizzBuzz rules.",
+        constraints: [
+          "1 <= n <= 10^4"
+        ],
+        examples: [
+          {
+            input: "n = 3",
+            output: "[\"1\",\"2\",\"Fizz\"]"
+          }
+        ],
+        hints: [
+          "Use modulo operator.",
+          "Check 15 before 3 and 5."
+        ],
+        starter: `function fizzBuzz(n) {
+  // Write your code here
+}`
+      }
+    ]
+  },
+   {
+    level: 12,
+    label: "Programming Basics",
+    completed: false,
+    locked:true,
+    color: "59,130,246",
+    secondary: "37,99,235",
+    desc: "Master the fundamentals of programming including variables, loops, conditions, and functions.",
+    topics: [
+      "Variables",
+      "Data Types",
+      "Operators",
+      "Loops",
+      "Functions"
+    ],
+    theory: [
+      {
+        title: "Variables",
+        body: "Variables are used to store values in memory."
+      },
+      {
+        title: "Loops",
+        body: "Loops allow repeating a block of code multiple times."
+      }
+    ],
+    problems: [
+      {
+        id: 1,
+        title: "Fizz Buzz",
+        difficulty: "Easy",
+        topic: "Programming Basics",
+        solved: false,
+        acceptance: 73.2,
+        xp: 50,
+        tags: ["Math", "Simulation"],
+        companies: ["Amazon", "Google"],
+        desc: "Given an integer n, return a string representation of numbers from 1 to n following FizzBuzz rules.",
+        constraints: [
+          "1 <= n <= 10^4"
+        ],
+        examples: [
+          {
+            input: "n = 3",
+            output: "[\"1\",\"2\",\"Fizz\"]"
+          }
+        ],
+        hints: [
+          "Use modulo operator.",
+          "Check 15 before 3 and 5."
+        ],
+        starter: `function fizzBuzz(n) {
+  // Write your code here
+}`
+      }
+    ]
+  }, {
+    level: 13,
+    label: "Programming Basics",
+    completed: false,
+    locked:true,
+    color: "59,130,246",
+    secondary: "37,99,235",
+    desc: "Master the fundamentals of programming including variables, loops, conditions, and functions.",
+    topics: [
+      "Variables",
+      "Data Types",
+      "Operators",
+      "Loops",
+      "Functions"
+    ],
+    theory: [
+      {
+        title: "Variables",
+        body: "Variables are used to store values in memory."
+      },
+      {
+        title: "Loops",
+        body: "Loops allow repeating a block of code multiple times."
+      }
+    ],
+    problems: [
+      {
+        id: 1,
+        title: "Fizz Buzz",
+        difficulty: "Easy",
+        topic: "Programming Basics",
+        solved: false,
+        acceptance: 73.2,
+        xp: 50,
+        tags: ["Math", "Simulation"],
+        companies: ["Amazon", "Google"],
+        desc: "Given an integer n, return a string representation of numbers from 1 to n following FizzBuzz rules.",
+        constraints: [
+          "1 <= n <= 10^4"
+        ],
+        examples: [
+          {
+            input: "n = 3",
+            output: "[\"1\",\"2\",\"Fizz\"]"
+          }
+        ],
+        hints: [
+          "Use modulo operator.",
+          "Check 15 before 3 and 5."
+        ],
+        starter: `function fizzBuzz(n) {
+  // Write your code here
+}`
+      }
+    ]
+  }
 
-export const PROBLEMS = [
-  // Arrays (level 11)
-  {
-    id: 1,
-    title: "Two Sum",
-    difficulty: "Easy",
-    topic: "Arrays",
-    level: 11,
-    solved: true,
-    acceptance: 49,
-    desc: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
-    examples: [
-      { input: "nums = [2,7,11,15], target = 9", output: "[0,1]" },
-      { input: "nums = [3,2,4], target = 6", output: "[1,2]" },
-    ],
-    starter: "function twoSum(nums, target) {\n  // your code here\n};",
-  },
-  {
-    id: 2,
-    title: "Best Time to Buy Stock",
-    difficulty: "Easy",
-    topic: "Arrays",
-    level: 11,
-    solved: true,
-    acceptance: 54,
-    desc: "Find the maximum profit from buying and selling a stock once.",
-    examples: [{ input: "prices = [7,1,5,3,6,4]", output: "5" }],
-    starter: "function maxProfit(prices) {\n  // your code here\n};",
-  },
-  {
-    id: 3,
-    title: "Maximum Subarray",
-    difficulty: "Medium",
-    topic: "Arrays",
-    level: 11,
-    solved: false,
-    acceptance: 50,
-    desc: "Find the contiguous subarray with the largest sum.",
-    examples: [{ input: "nums = [-2,1,-3,4,-1,2,1,-5,4]", output: "6" }],
-    starter: "function maxSubArray(nums) {\n  // your code here\n};",
-  },
-  {
-    id: 4,
-    title: "Container With Most Water",
-    difficulty: "Medium",
-    topic: "Arrays",
-    level: 11,
-    solved: false,
-    acceptance: 54,
-    desc: "Find two lines that together with the x-axis forms a container that holds the most water.",
-    examples: [{ input: "height = [1,8,6,2,5,4,8,3,7]", output: "49" }],
-    starter: "function maxArea(height) {\n  // your code here\n};",
-  },
-  {
-    id: 5,
-    title: "Trapping Rain Water",
-    difficulty: "Hard",
-    topic: "Arrays",
-    level: 11,
-    solved: false,
-    acceptance: 60,
-    desc: "Given n non-negative integers representing elevation map, compute how much water it can trap.",
-    examples: [{ input: "height = [0,1,0,2,1,0,1,3,2,1,2,1]", output: "6" }],
-    starter: "function trap(height) {\n  // your code here\n};",
-  },
-  // Recursion (level 12)
-  {
-    id: 6,
-    title: "Fibonacci Number",
-    difficulty: "Easy",
-    topic: "Recursion",
-    level: 12,
-    solved: true,
-    acceptance: 69,
-    desc: "Calculate the nth Fibonacci number.",
-    examples: [{ input: "n = 4", output: "3" }],
-    starter: "function fib(n) {\n  // your code here\n};",
-  },
-  {
-    id: 7,
-    title: "Climbing Stairs",
-    difficulty: "Easy",
-    topic: "Recursion",
-    level: 12,
-    solved: true,
-    acceptance: 52,
-    desc: "You can climb 1 or 2 steps. How many ways to reach the top?",
-    examples: [{ input: "n = 3", output: "3" }],
-    starter: "function climbStairs(n) {\n  // your code here\n};",
-  },
-  {
-    id: 8,
-    title: "Permutations",
-    difficulty: "Medium",
-    topic: "Recursion",
-    level: 12,
-    solved: false,
-    acceptance: 77,
-    desc: "Return all possible permutations of a distinct integer array.",
-    examples: [{ input: "nums = [1,2,3]", output: "[[1,2,3],[1,3,2],...]" }],
-    starter: "function permute(nums) {\n  // your code here\n};",
-  },
-  {
-    id: 9,
-    title: "Subsets",
-    difficulty: "Medium",
-    topic: "Recursion",
-    level: 12,
-    solved: false,
-    acceptance: 75,
-    desc: "Return all possible subsets (the power set).",
-    examples: [{ input: "nums = [1,2,3]", output: "[[],[1],[2],[1,2],...]" }],
-    starter: "function subsets(nums) {\n  // your code here\n};",
-  },
-  {
-    id: 10,
-    title: "N-Queens",
-    difficulty: "Hard",
-    topic: "Recursion",
-    level: 12,
-    solved: false,
-    acceptance: 67,
-    desc: "Place n queens on an n×n chessboard so no two queens attack each other.",
-    examples: [
-      { input: "n = 4", output: '[[".Q..","...Q","Q...","..Q."],...]' },
-    ],
-    starter: "function solveNQueens(n) {\n  // your code here\n};",
-  },
-  // Binary Trees (level 13)
-  {
-    id: 11,
-    title: "Inorder Traversal",
-    difficulty: "Easy",
-    topic: "Binary Trees",
-    level: 13,
-    solved: false,
-    acceptance: 74,
-    desc: "Return the inorder traversal of a binary tree's node values.",
-    examples: [{ input: "root = [1,null,2,3]", output: "[1,3,2]" }],
-    starter: "function inorderTraversal(root) {\n  // your code here\n};",
-  },
-  {
-    id: 12,
-    title: "Maximum Depth of Tree",
-    difficulty: "Easy",
-    topic: "Binary Trees",
-    level: 13,
-    solved: false,
-    acceptance: 73,
-    desc: "Find the maximum depth of a binary tree.",
-    examples: [{ input: "root = [3,9,20,null,null,15,7]", output: "3" }],
-    starter: "function maxDepth(root) {\n  // your code here\n};",
-  },
-  {
-    id: 13,
-    title: "Validate BST",
-    difficulty: "Medium",
-    topic: "Binary Trees",
-    level: 13,
-    solved: false,
-    acceptance: 32,
-    desc: "Determine if a binary tree is a valid binary search tree.",
-    examples: [{ input: "root = [2,1,3]", output: "true" }],
-    starter: "function isValidBST(root) {\n  // your code here\n};",
-  },
-  {
-    id: 14,
-    title: "Level Order Traversal",
-    difficulty: "Medium",
-    topic: "Binary Trees",
-    level: 13,
-    solved: false,
-    acceptance: 66,
-    desc: "Return the level order traversal of a binary tree's node values.",
-    examples: [
-      {
-        input: "root = [3,9,20,null,null,15,7]",
-        output: "[[3],[9,20],[15,7]]",
-      },
-    ],
-    starter: "function levelOrder(root) {\n  // your code here\n};",
-  },
-  {
-    id: 15,
-    title: "Binary Tree Max Path Sum",
-    difficulty: "Hard",
-    topic: "Binary Trees",
-    level: 13,
-    solved: false,
-    acceptance: 39,
-    desc: "Find the maximum path sum in a binary tree.",
-    examples: [{ input: "root = [-10,9,20,null,null,15,7]", output: "42" }],
-    starter: "function maxPathSum(root) {\n  // your code here\n};",
-  },
 ];
 
 export const diffColor = {
@@ -327,3 +605,8 @@ export const diffColor = {
     border: "border-red-400/30",
   },
 };
+
+export const RoadmapNodes = ROADMAP;
+export const LEVELS = ROADMAP;
+export const PROBLEMS = ROADMAP.flatMap((node) => node.problems ?? node.problemIds ?? []);
+

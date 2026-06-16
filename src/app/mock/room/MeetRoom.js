@@ -1,409 +1,299 @@
 "use client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-  Check,
-  Code2,
-  Copy,
-  MessageSquare,
-  Mic,
-  MicOff,
-  PenLine,
-  PhoneOff,
-  ScreenShare,
-  ScreenShareOff,
-  Video,
-  VideoOff,
-  X,
+  Check, Code2, Copy, MessageSquare, Mic, MicOff, PenLine,
+  PhoneOff, ScreenShare, ScreenShareOff, Video, VideoOff,
+  Users, Send, X, ChevronLeft,
 } from "lucide-react";
 import CodeEditorPanel from "./CodeEditorPanel";
 import WhiteboardCanvas from "./WhiteboardCanvas";
 
-function VideoTile({ stream, label, muted = false, noVideo = false, badge, className = "" }) {
-  const ref = useRef(null);
+const ICE_SERVERS = [
+  { urls: "stun:stun.l.google.com:19302" },
+  { urls: "stun:stun1.l.google.com:19302" },
+  { urls: "turn:openrelay.metered.ca:80",  username: "openrelayproject", credential: "openrelayproject" },
+  { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" },
+  { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelayproject", credential: "openrelayproject" },
+];
 
+// ── Video Tile ───────────────────────────────────────────────────────────────
+function VideoTile({ stream, label, muted, noVideo }) {
+  const ref = useRef(null);
   useEffect(() => {
-    if (!ref.current) return;
-    ref.current.srcObject = stream ?? null;
-  }, [stream]);
+    const el = ref.current;
+    if (!el) return;
+    el.muted  = !!muted;   // must set via property, not attribute
+    el.srcObject = stream ?? null;
+    if (stream) el.play().catch(() => {});
+  }, [stream, muted]);
 
   return (
-    <div
-      className={`relative w-full aspect-[4/3] sm:aspect-video rounded-3xl overflow-hidden bg-[#0d1225] border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.35)] ${className}`}
-    >
-      <div
-        className="absolute inset-0 opacity-70"
-        style={{
-          background:
-            "radial-gradient(1200px circle at 20% 0%, rgba(99,102,241,0.35), transparent 55%), radial-gradient(800px circle at 90% 20%, rgba(34,211,238,0.18), transparent 55%)",
-        }}
+    <div className="relative w-full h-full rounded-xl overflow-hidden bg-[#1a1d2e] flex items-center justify-center">
+      {/* always render video element — hide when no stream/noVideo */}
+      <video
+        ref={ref}
+        autoPlay
+        playsInline
+        className={`absolute inset-0 w-full h-full object-cover ${
+          stream && !noVideo ? "" : "hidden"
+        }`}
       />
-
-      {stream && !noVideo ? (
-        <video ref={ref} autoPlay playsInline muted={muted} className="absolute inset-0 w-full h-full object-cover" />
-      ) : (
-        <div className="relative h-full w-full flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl font-extrabold text-slate-200">
-              {(label?.[0] ?? "?").toUpperCase()}
-            </div>
-            <div className="text-xs text-slate-500">Camera off</div>
+      {(!stream || noVideo) && (
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-lg font-bold text-white">
+            {(label ?? "?").slice(0, 2).toUpperCase()}
           </div>
+          <span className="text-xs text-slate-500">Camera off</span>
         </div>
       )}
-
-      <div className="absolute left-4 right-4 bottom-4 flex items-center justify-between gap-2">
-        <div className="min-w-0 flex items-center gap-2">
-          <div className="px-3 py-1.5 rounded-2xl bg-black/40 border border-white/10 backdrop-blur text-xs font-semibold text-slate-100 truncate">
-            {label}
-          </div>
-          {badge && (
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-200 text-[11px] font-semibold">
-              {badge.icon}
-              {badge.text}
-            </div>
-          )}
-        </div>
+      <div className="absolute bottom-2 left-2 right-2 flex items-end justify-between">
+        <span className="text-xs font-semibold text-white bg-black/60 backdrop-blur px-2 py-0.5 rounded-full truncate">
+          {label}
+        </span>
+        {muted && (
+          <span className="w-6 h-6 bg-black/60 backdrop-blur rounded-full flex items-center justify-center shrink-0">
+            <MicOff className="w-3 h-3 text-red-400" />
+          </span>
+        )}
       </div>
     </div>
   );
 }
 
-function ControlBtn({ onClick, icon: Icon, active, danger, label }) {
+// ── Grid: fixed height tiles ─────────────────────────────────────────────────
+function VideoGrid({ participants, filmstrip = false }) {
+  const n = participants.length;
+
+  if (filmstrip) {
+    return (
+      <div className="flex flex-col gap-2 p-2 overflow-y-auto scrollbar-hide h-full">
+        {participants.map(p => (
+          <div key={p.id} className="shrink-0 w-full" style={{ height: 110 }}>
+            <VideoTile {...p} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Calculate rows/cols for best fit
+  const cols = n <= 1 ? 1 : n <= 2 ? 2 : n <= 4 ? 2 : n <= 6 ? 3 : 3;
+  const rows = Math.ceil(n / cols);
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`h-12 w-12 rounded-full flex items-center justify-center border transition ${
-        danger
-          ? "bg-red-500/15 border-red-500/25 text-red-100 hover:bg-red-500/20"
-          : active
-            ? "bg-indigo-500/15 border-indigo-500/25 text-indigo-100 hover:bg-indigo-500/20"
-            : "bg-white/5 border-white/10 text-slate-200 hover:bg-white/10"
-      }`}
-      aria-label={label}
-      title={label}
-    >
-      <Icon className="w-5 h-5" />
+    <div className="h-full p-2 flex flex-col gap-2">
+      {Array.from({ length: rows }).map((_, r) => (
+        <div key={r} className="flex-1 flex gap-2 min-h-0">
+          {participants.slice(r * cols, r * cols + cols).map(p => (
+            <div key={p.id} className="flex-1 min-w-0">
+              <VideoTile {...p} />
+            </div>
+          ))}
+          {/* fill empty cells in last row */}
+          {r === rows - 1 && Array.from({ length: cols - (n % cols || cols) }).map((_, i) => (
+            <div key={`empty-${i}`} className="flex-1 min-w-0" />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Icon Button ───────────────────────────────────────────────────────────────
+function IconBtn({ onClick, icon: Icon, active = true, danger = false, label, badge }) {
+  return (
+    <button onClick={onClick} title={label} aria-label={label} className="flex flex-col items-center gap-1">
+      <div className={`relative w-11 h-11 rounded-full flex items-center justify-center transition-all
+        ${danger ? "bg-red-600 hover:bg-red-500 text-white"
+          : active ? "bg-white/15 hover:bg-white/25 text-white"
+          : "bg-[#252836] hover:bg-[#2e3249] text-slate-400"}`}>
+        <Icon className="w-5 h-5" />
+        {badge > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-[9px] font-bold text-white flex items-center justify-center">
+            {badge > 9 ? "9+" : badge}
+          </span>
+        )}
+      </div>
+      <span className="text-[10px] text-slate-500 hidden sm:block leading-none">{label}</span>
     </button>
   );
 }
 
-function DockPanel({ mode, onClose, onSwitch, className = "" }) {
-  const isWhiteboard = mode === "whiteboard";
-  return (
-    <div
-      className={`h-full min-h-0 rounded-3xl overflow-hidden bg-[#0d1225] border border-white/10 shadow-2xl flex flex-col ${className}`}
-    >
-      <div className="shrink-0 h-12 px-3 flex items-center justify-between gap-2 border-b border-white/5 bg-[#0d1225]/80 backdrop-blur">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 p-1 rounded-2xl bg-white/5 border border-white/10">
-            <button
-              type="button"
-              onClick={() => onSwitch("whiteboard")}
-              className={`h-9 px-3 rounded-xl text-xs font-semibold transition flex items-center gap-2 ${
-                isWhiteboard ? "bg-indigo-600 text-white" : "text-slate-300 hover:bg-white/5"
-              }`}
-              title="Whiteboard"
-            >
-              <PenLine className="w-4 h-4" />
-              Whiteboard
-            </button>
-            <button
-              type="button"
-              onClick={() => onSwitch("code")}
-              className={`h-9 px-3 rounded-xl text-xs font-semibold transition flex items-center gap-2 ${
-                !isWhiteboard ? "bg-indigo-600 text-white" : "text-slate-300 hover:bg-white/5"
-              }`}
-              title="Code editor"
-            >
-              <Code2 className="w-4 h-4" />
-              Code
-            </button>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={onClose}
-          className="h-9 w-9 rounded-xl hover:bg-white/5 text-slate-300 transition flex items-center justify-center"
-          aria-label="Close panel"
-          title="Close"
-        >
-          <X className="w-4.5 h-4.5" />
-        </button>
-      </div>
-
-      <div className="flex-1 min-h-0">
-        {isWhiteboard ? <WhiteboardCanvas /> : <CodeEditorPanel />}
-      </div>
-    </div>
-  );
-}
-
-function StageShell({ title, subtitle, icon, onClose, children }) {
-  return (
-    <div className="h-full min-h-0 rounded-3xl overflow-hidden bg-[#0d1225] border border-white/10 shadow-2xl flex flex-col">
-      <div className="shrink-0 h-12 px-3 flex items-center justify-between gap-2 border-b border-white/5 bg-[#0d1225]/80 backdrop-blur">
-        <div className="min-w-0 flex items-center gap-2">
-          <div className="h-9 w-9 rounded-xl bg-indigo-600/15 border border-indigo-500/20 flex items-center justify-center shrink-0">
-            {icon}
-          </div>
-          <div className="min-w-0">
-            <div className="text-sm font-semibold text-slate-100 truncate">{title}</div>
-            {subtitle ? <div className="text-[11px] text-slate-500 truncate">{subtitle}</div> : null}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={onClose}
-          className="h-9 w-9 rounded-xl hover:bg-white/5 text-slate-300 transition flex items-center justify-center"
-          aria-label="Close stage"
-          title="Close"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
-      <div className="flex-1 min-h-0">{children}</div>
-    </div>
-  );
-}
-
+// ── Main ──────────────────────────────────────────────────────────────────────
 export default function MeetRoom() {
-  const params = useSearchParams();
-  const router = useRouter();
+  const params   = useSearchParams();
+  const router   = useRouter();
   const roomCode = params.get("code") ?? "unknown";
 
   const peersRef = useRef(new Map());
 
   const [clientId] = useState(() => {
-    if (typeof window === "undefined") return null;
-    const existing = window.sessionStorage.getItem("codemeet-client-id");
-    const id = existing || (crypto?.randomUUID?.() ?? `c_${Math.random().toString(36).slice(2, 10)}`);
-    if (!existing) window.sessionStorage.setItem("codemeet-client-id", id);
+    if (typeof window === "undefined") return "ssr";
+    const ex = sessionStorage.getItem("codemeet-cid");
+    const id = ex || crypto.randomUUID();
+    if (!ex) sessionStorage.setItem("codemeet-cid", id);
     return id;
   });
-  const [remotePeers, setRemotePeers] = useState([]); // { id, stream }
-  const [chatOpen, setChatOpen] = useState(false);
-  const [chatUnread, setChatUnread] = useState(0);
-  const [chatDraft, setChatDraft] = useState("");
-  const [chatMessages, setChatMessages] = useState([]); // { id, from, text, ts }
-  const chatOpenRef = useRef(false);
 
-  const [localStream, setLocalStream] = useState(null);
-  const [micOn, setMicOn] = useState(true);
-  const [camOn, setCamOn] = useState(true);
+  const [remotePeers,  setRemotePeers]  = useState([]);
+  const [localStream,  setLocalStream]  = useState(null);
   const [screenStream, setScreenStream] = useState(null);
-  const [stage, setStage] = useState(null); // screen | whiteboard | code | null
+  const [micOn,  setMicOn]  = useState(true);
+  const [camOn,  setCamOn]  = useState(true);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    let stream;
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((s) => {
-        stream = s;
-        setLocalStream(s);
-      })
-      .catch(() => setLocalStream(null));
+  const [mobileTab,    setMobileTab]    = useState("video");
+  const [desktopStage, setDesktopStage] = useState(null);
+  const [chatOpen,     setChatOpen]     = useState(false);
 
-    return () => stream?.getTracks().forEach((t) => t.stop());
+  const [chatDraft,    setChatDraft]    = useState("");
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatUnread,   setChatUnread]   = useState(0);
+
+  // Sync events for whiteboard / code
+  const [syncEvent, setSyncEvent] = useState(null);
+
+  const chatOpenRef = useRef(false);
+  const chatEndRef  = useRef(null);
+
+  useEffect(() => { chatOpenRef.current = chatOpen; }, [chatOpen]);
+  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chatMessages]);
+
+  // ── Get local media — echo fix: audio only, no video loopback ──
+  const [mediaError, setMediaError] = useState(null);
+
+  useEffect(() => {
+    let s;
+    navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24 } },
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    }).then(stream => {
+      stream.getTracks().forEach(t => { t.enabled = true; });
+      s = stream;
+      setLocalStream(stream);
+      setMicOn(true);
+      setCamOn(true);
+    }).catch((err) => {
+      setMediaError(err.name);
+      navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      }).then(stream => {
+        stream.getTracks().forEach(t => { t.enabled = true; });
+        s = stream;
+        setLocalStream(stream);
+        setMicOn(true);
+      }).catch(() => setLocalStream(null));
+    });
+    return () => s?.getTracks().forEach(t => t.stop());
   }, []);
 
-  useEffect(() => {
-    chatOpenRef.current = chatOpen;
-  }, [chatOpen]);
+  // ── Signaling ──
+  const postSignal = useCallback(async (to, type, data) => {
+    try {
+      await fetch(`/api/rooms/${encodeURIComponent(roomCode)}/signal`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ from: clientId, to: to ?? "", type, data }),
+      });
+    } catch { /* ignore */ }
+  }, [clientId, roomCode]);
 
-  const postToRoom = useCallback(
-    async ({ to = "", type, data }) => {
-      if (!clientId || !roomCode) return;
-      try {
-        await fetch(`/api/rooms/${encodeURIComponent(roomCode)}/signal`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ from: clientId, to, type, data }),
-        });
-      } catch {
-        // ignore
-      }
-    },
-    [clientId, roomCode]
-  );
-
-  const closePeer = useCallback((peerId) => {
+  const closePeer = useCallback(peerId => {
     const peer = peersRef.current.get(peerId);
     if (!peer) return;
-    try {
-      peer.pc.onicecandidate = null;
-      peer.pc.ontrack = null;
-      peer.pc.onnegotiationneeded = null;
-      peer.pc.close();
-    } catch {
-      // ignore
-    }
+    try { peer.pc.close(); } catch { /* ignore */ }
     peersRef.current.delete(peerId);
-    setRemotePeers((cur) => cur.filter((p) => p.id !== peerId));
+    setRemotePeers(c => c.filter(p => p.id !== peerId));
   }, []);
 
-  const ensurePeer = useCallback(
-    (peerId) => {
-      if (!peerId || peerId === clientId) return null;
-      if (peersRef.current.has(peerId)) return peersRef.current.get(peerId);
+  const ensurePeer = useCallback(peerId => {
+    if (!peerId || peerId === clientId) return null;
+    if (peersRef.current.has(peerId)) return peersRef.current.get(peerId);
 
-      const pc = new RTCPeerConnection({
-        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-      });
+    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+    const polite = clientId.localeCompare(peerId) < 0;
+    const peer = { pc, polite, makingOffer: false, ignoreOffer: false };
 
-      const polite = String(clientId ?? "").localeCompare(String(peerId)) < 0;
-      const peer = {
-        pc,
-        peerId,
-        polite,
-        makingOffer: false,
-        ignoreOffer: false,
-        stream: null,
-      };
+    pc.onicecandidate = ({ candidate }) => {
+      if (candidate) postSignal(peerId, "webrtc", { candidate });
+    };
 
-      pc.onicecandidate = ({ candidate }) => {
-        if (candidate) postToRoom({ to: peerId, type: "webrtc", data: { candidate } });
-      };
+    pc.oniceconnectionstatechange = () => {
+      if (pc.iceConnectionState === "failed") pc.restartIce?.();
+    };
 
-      pc.ontrack = (event) => {
-        const stream = event.streams?.[0];
-        if (stream) {
-          peer.stream = stream;
-          setRemotePeers((cur) => {
-            const next = cur.filter((p) => p.id !== peerId);
-            next.push({ id: peerId, stream });
-            return next;
-          });
-          return;
-        }
+    const remoteStream = new MediaStream();
 
-        const fallback = peer.stream ?? new MediaStream();
-        fallback.addTrack(event.track);
-        peer.stream = fallback;
-        setRemotePeers((cur) => {
-          const next = cur.filter((p) => p.id !== peerId);
-          next.push({ id: peerId, stream: fallback });
-          return next;
-        });
-      };
+    pc.ontrack = ({ track }) => {
+      remoteStream.addTrack(track);
+      setRemotePeers(c => [...c.filter(p => p.id !== peerId), { id: peerId, stream: remoteStream }]);
+    };
 
-      pc.onnegotiationneeded = async () => {
-        try {
-          peer.makingOffer = true;
-          await pc.setLocalDescription(await pc.createOffer());
-          postToRoom({ to: peerId, type: "webrtc", data: { description: pc.localDescription } });
-        } catch {
-          // ignore
-        } finally {
-          peer.makingOffer = false;
-        }
-      };
+    pc.onnegotiationneeded = async () => {
+      try {
+        peer.makingOffer = true;
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        postSignal(peerId, "webrtc", { description: pc.localDescription });
+      } catch (e) {
+        console.warn("negotiation error", e);
+      } finally { peer.makingOffer = false; }
+    };
 
-      if (localStream) {
-        localStream.getAudioTracks().forEach((track) => pc.addTrack(track, localStream));
-      }
+    if (localStream) {
+      for (const t of localStream.getTracks()) pc.addTrack(t, localStream);
+    }
 
-      const activeVideoTrack = screenStream?.getVideoTracks?.()[0] ?? localStream?.getVideoTracks?.()[0] ?? null;
-      const activeVideoStream = screenStream ?? localStream;
-      if (activeVideoTrack && activeVideoStream) {
-        pc.addTrack(activeVideoTrack, activeVideoStream);
-      }
+    peersRef.current.set(peerId, peer);
+    return peer;
+  }, [clientId, localStream, postSignal]);
 
-      peersRef.current.set(peerId, peer);
-      return peer;
-    },
-    [clientId, localStream, postToRoom, screenStream]
-  );
-
+  // Replace video track on screen toggle
   useEffect(() => {
-    if (!localStream && !screenStream) return;
-    const activeVideoTrack = screenStream?.getVideoTracks?.()[0] ?? localStream?.getVideoTracks?.()[0] ?? null;
-    const activeVideoStream = screenStream ?? localStream ?? null;
+    if (!localStream) return;
+    const vid = screenStream?.getVideoTracks()[0] ?? localStream.getVideoTracks()[0];
+    if (!vid) return;
     for (const peer of peersRef.current.values()) {
-      const senders = peer.pc.getSenders();
-
-      if (localStream) {
-        for (const track of localStream.getAudioTracks()) {
-          const existing = senders.find((s) => s.track?.kind === track.kind);
-          if (!existing) peer.pc.addTrack(track, localStream);
-        }
-      }
-
-      if (activeVideoTrack && activeVideoStream) {
-        const sender = senders.find((s) => s.track?.kind === "video");
-        if (!sender) peer.pc.addTrack(activeVideoTrack, activeVideoStream);
-        else if (sender.track !== activeVideoTrack) sender.replaceTrack(activeVideoTrack);
-      }
+      const sender = peer.pc.getSenders().find(s => s.track?.kind === "video");
+      if (sender) sender.replaceTrack(vid).catch(() => {});
     }
   }, [localStream, screenStream]);
 
+  // SSE with auto-reconnect (Cloudflare/ngrok safe)
   useEffect(() => {
-    if (!clientId || !roomCode) return;
+    let es = null;
+    let retryTimer = null;
+    let dead = false;
 
-    const url = `/api/rooms/${encodeURIComponent(roomCode)}/events?clientId=${encodeURIComponent(clientId)}`;
-    const es = new EventSource(url);
-
-    es.onmessage = async (event) => {
-      let msg;
-      try {
-        msg = JSON.parse(event.data);
-      } catch {
-        return;
-      }
-
-      if (msg.type === "hello") {
-        const peers = Array.isArray(msg.peers) ? msg.peers : [];
-        peers.forEach((pid) => ensurePeer(String(pid)));
-        return;
-      }
-
-      if (msg.type === "peer-join") {
-        ensurePeer(String(msg.peerId ?? ""));
-        return;
-      }
-
-      if (msg.type === "peer-leave") {
-        closePeer(String(msg.peerId ?? ""));
-        return;
-      }
+    async function processMsg(msg) {
+      if (msg.type === "hello") { (msg.peers ?? []).forEach(p => ensurePeer(String(p))); return; }
+      if (msg.type === "peer-join")  { ensurePeer(String(msg.peerId ?? "")); return; }
+      if (msg.type === "peer-leave") { closePeer(String(msg.peerId ?? ""));  return; }
 
       if (msg.type === "webrtc") {
         const from = String(msg.from ?? "");
         const peer = ensurePeer(from);
         if (!peer) return;
-
-        const description = msg.data?.description ?? null;
-        const candidate = msg.data?.candidate ?? null;
-
+        const { description, candidate } = msg.data ?? {};
         try {
           if (description) {
-            const offerCollision =
-              description.type === "offer" && (peer.makingOffer || peer.pc.signalingState !== "stable");
-            peer.ignoreOffer = !peer.polite && offerCollision;
+            const collision = description.type === "offer" &&
+              (peer.makingOffer || peer.pc.signalingState !== "stable");
+            peer.ignoreOffer = !peer.polite && collision;
             if (peer.ignoreOffer) return;
-
-            await peer.pc.setRemoteDescription(description);
+            await peer.pc.setRemoteDescription(new RTCSessionDescription(description));
             if (description.type === "offer") {
-              await peer.pc.setLocalDescription(await peer.pc.createAnswer());
-              postToRoom({ to: from, type: "webrtc", data: { description: peer.pc.localDescription } });
+              const ans = await peer.pc.createAnswer();
+              await peer.pc.setLocalDescription(ans);
+              postSignal(from, "webrtc", { description: peer.pc.localDescription });
             }
-            return;
           }
-
           if (candidate) {
-            try {
-              await peer.pc.addIceCandidate(candidate);
-            } catch {
-              if (!peer.ignoreOffer) throw new Error("addIceCandidate failed");
-            }
+            try { await peer.pc.addIceCandidate(new RTCIceCandidate(candidate)); }
+            catch (e) { if (!peer.ignoreOffer) console.warn("ICE candidate err", e); }
           }
-        } catch {
-          // ignore
-        }
+        } catch (e) { console.warn("webrtc err", e); }
         return;
       }
 
@@ -411,469 +301,324 @@ export default function MeetRoom() {
         const text = String(msg.data?.text ?? "").trim();
         if (!text) return;
         const ts = Number(msg.data?.ts ?? Date.now());
-        setChatMessages((cur) => [...cur, { id: `${ts}_${Math.random().toString(36).slice(2, 8)}`, from: msg.from, text, ts }]);
-        if (!chatOpenRef.current) setChatUnread((n) => n + 1);
+        setChatMessages(c => [...c, { id: `${ts}_${Math.random().toString(36).slice(2,7)}`, from: msg.from, text, ts }]);
+        if (!chatOpenRef.current) setChatUnread(n => n + 1);
+        return;
       }
-    };
 
-    es.onerror = () => {
-      // connection will auto-retry
-    };
+      if (msg.type === "wb" || msg.type === "code") {
+        // ignore own broadcasts
+        if (msg.from === clientId) return;
+        setSyncEvent({ type: msg.type, data: msg.data, _t: Date.now() });
+      }
+    }
+
+    function connect() {
+      if (dead) return;
+      const url = `/api/rooms/${encodeURIComponent(roomCode)}/events?clientId=${encodeURIComponent(clientId)}`;
+      es = new EventSource(url);
+      es.onmessage = ({ data: raw }) => {
+        let msg; try { msg = JSON.parse(raw); } catch { return; }
+        processMsg(msg);
+      };
+      es.onerror = () => {
+        es.close();
+        if (!dead) retryTimer = setTimeout(connect, 2000);
+      };
+    }
+
+    connect();
 
     return () => {
-      es.close();
+      dead = true;
+      clearTimeout(retryTimer);
+      es?.close();
+      Array.from(peersRef.current.keys()).forEach(pid => closePeer(pid));
     };
-  }, [clientId, closePeer, ensurePeer, postToRoom, roomCode]);
+  }, [clientId, closePeer, ensurePeer, postSignal, roomCode]);
 
-  useEffect(() => {
-    const peersAtMount = peersRef.current;
-    return () => {
-      for (const peerId of peersAtMount.keys()) closePeer(peerId);
-    };
-  }, [closePeer]);
-
+  // ── Controls ──
   const toggleMic = useCallback(() => {
-    localStream?.getAudioTracks().forEach((t) => {
-      t.enabled = !t.enabled;
-    });
-    setMicOn((v) => !v);
+    localStream?.getAudioTracks().forEach(t => { t.enabled = !t.enabled; });
+    setMicOn(v => !v);
   }, [localStream]);
 
   const toggleCam = useCallback(() => {
-    localStream?.getVideoTracks().forEach((t) => {
-      t.enabled = !t.enabled;
-    });
-    setCamOn((v) => !v);
+    localStream?.getVideoTracks().forEach(t => { t.enabled = !t.enabled; });
+    setCamOn(v => !v);
   }, [localStream]);
 
   const toggleScreen = useCallback(async () => {
     if (screenStream) {
-      screenStream.getTracks().forEach((t) => t.stop());
+      screenStream.getTracks().forEach(t => t.stop());
       setScreenStream(null);
-      setStage((cur) => (cur === "screen" ? null : cur));
       return;
     }
-
     try {
-      const s = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
-      const track = s.getVideoTracks?.()[0];
-      track?.addEventListener?.("ended", () => {
-        s.getTracks().forEach((t) => t.stop());
-        setScreenStream(null);
-        setStage((cur) => (cur === "screen" ? null : cur));
-      });
+      const s = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      s.getVideoTracks()[0]?.addEventListener("ended", () => setScreenStream(null));
       setScreenStream(s);
-      setStage("screen");
-    } catch {
-      // user canceled
-    }
+      setDesktopStage("screen");
+    } catch { /* cancelled */ }
   }, [screenStream]);
 
-  function toggleStage(next) {
-    setStage((cur) => (cur === next ? null : next));
-  }
-
-  function endCall() {
-    for (const peerId of Array.from(peersRef.current.keys())) closePeer(peerId);
-    localStream?.getTracks().forEach((t) => t.stop());
-    screenStream?.getTracks().forEach((t) => t.stop());
-    setScreenStream(null);
-    setStage(null);
-    router.push("/mock");
-  }
-
-  async function copyLink() {
-    try {
-      const url = window.location.href;
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1200);
-    } catch {
-      // ignore
-    }
-  }
-
-  const stageMode = stage;
-  const isStageView = stageMode !== null;
-
-  const sharingTile = useMemo(() => {
-    if (!screenStream) return null;
-    return {
-      id: "screen-share",
-      label: "You (screen)",
-      stream: screenStream,
-      muted: true,
-      noVideo: false,
-      badge: { icon: <ScreenShare className="w-3.5 h-3.5" />, text: "Sharing" },
-    };
-  }, [screenStream]);
-
-  const participants = useMemo(() => {
-    const list = [
-      {
-        id: "you",
-        label: "You",
-        stream: localStream,
-        muted: true,
-        noVideo: !camOn,
-        badge: micOn ? null : { icon: <MicOff className="w-3.5 h-3.5" />, text: "Muted" },
-      },
-      ...remotePeers.map((p) => ({
-        id: p.id,
-        label: `Guest ${String(p.id).slice(0, 4).toUpperCase()}`,
-        stream: p.stream,
-        muted: false,
-        noVideo: false,
-        badge: null,
-      })),
-    ];
-    return list;
-  }, [camOn, localStream, micOn, remotePeers]);
-
-  const gridTiles = useMemo(() => {
-    if (!sharingTile || stageMode !== null) return participants;
-    return [sharingTile, ...participants];
-  }, [participants, sharingTile, stageMode]);
-
-  const filmstripTiles = useMemo(() => {
-    if (!sharingTile) return participants;
-    if (stageMode === "screen") return participants;
-    return [sharingTile, ...participants];
-  }, [participants, sharingTile, stageMode]);
+  // Broadcast handler for whiteboard & code
+  const handleBroadcast = useCallback(async (payload) => {
+    await postSignal("", payload.type, payload.data);
+  }, [postSignal]);
 
   const sendChat = useCallback(async () => {
     const text = chatDraft.trim();
     if (!text) return;
     const ts = Date.now();
-    setChatMessages((cur) => [...cur, { id: `${ts}_${Math.random().toString(36).slice(2, 8)}`, from: clientId, text, ts }]);
+    setChatMessages(c => [...c, { id: `${ts}_me`, from: clientId, text, ts }]);
     setChatDraft("");
-    await postToRoom({ type: "chat", data: { text, ts } });
-  }, [chatDraft, clientId, postToRoom]);
+    await postSignal("", "chat", { text, ts });
+  }, [chatDraft, clientId, postSignal]);
+
+  function endCall() {
+    Array.from(peersRef.current.keys()).forEach(pid => closePeer(pid));
+    localStream?.getTracks().forEach(t => t.stop());
+    screenStream?.getTracks().forEach(t => t.stop());
+    router.push("/mock");
+  }
+
+  async function copyLink() {
+    try { await navigator.clipboard.writeText(window.location.href); } catch { /* ignore */ }
+    setCopied(true); setTimeout(() => setCopied(false), 1500);
+  }
+
+  const participants = [
+    { id: "you", label: "You (me)", stream: localStream, muted: true, noVideo: !camOn },
+    ...remotePeers.map(p => ({
+      id: p.id, label: `Peer ${p.id.slice(0,4).toUpperCase()}`,
+      stream: p.stream, muted: false, noVideo: false,
+    })),
+  ];
+  const total = participants.length;
+
+  // ── Shared panels ──
+  const ChatPanel = (
+    <div className="flex flex-col h-full bg-[#13161f]">
+      <div className="shrink-0 h-11 px-4 flex items-center gap-2 border-b border-white/5">
+        <MessageSquare className="w-4 h-4 text-indigo-400" />
+        <span className="text-sm font-semibold text-slate-200 flex-1">Chat</span>
+        <button onClick={() => { setChatOpen(false); setMobileTab("video"); }}
+          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide p-3 space-y-2">
+        {chatMessages.length === 0 ? (
+          <div className="h-full flex flex-col items-center justify-center gap-2 text-slate-600">
+            <MessageSquare className="w-7 h-7 opacity-20" />
+            <p className="text-xs">No messages yet</p>
+          </div>
+        ) : chatMessages.map(m => {
+          const mine = m.from === clientId;
+          return (
+            <div key={m.id} className={`flex flex-col gap-0.5 ${mine ? "items-end" : "items-start"}`}>
+              {!mine && <span className="text-[10px] text-slate-500 px-1">Peer {m.from.slice(0,4).toUpperCase()}</span>}
+              <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm leading-relaxed break-words
+                ${mine ? "bg-indigo-600 text-white rounded-tr-sm" : "bg-white/8 border border-white/8 text-slate-200 rounded-tl-sm"}`}>
+                {m.text}
+              </div>
+            </div>
+          );
+        })}
+        <div ref={chatEndRef} />
+      </div>
+      <form onSubmit={e => { e.preventDefault(); sendChat(); }} className="shrink-0 p-3 border-t border-white/5">
+        <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2 focus-within:border-indigo-500/50 transition">
+          <input value={chatDraft} onChange={e => setChatDraft(e.target.value)}
+            placeholder="Message..." autoComplete="off"
+            className="flex-1 bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none" />
+          <button type="submit" disabled={!chatDraft.trim()}
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 transition">
+            <Send className="w-3.5 h-3.5 text-white" />
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+
+  const PeoplePanel = (
+    <div className="flex flex-col h-full bg-[#13161f]">
+      <div className="shrink-0 h-11 px-4 flex items-center gap-2 border-b border-white/5">
+        <Users className="w-4 h-4 text-indigo-400" />
+        <span className="text-sm font-semibold text-slate-200 flex-1">People ({total})</span>
+        <button onClick={() => setMobileTab("video")}
+          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+      <div className="flex-1 overflow-y-auto scrollbar-hide p-2 space-y-1">
+        {participants.map(p => (
+          <div key={p.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-xs font-bold text-white shrink-0">
+              {p.label.slice(0,2).toUpperCase()}
+            </div>
+            <span className="text-sm text-slate-200 flex-1 truncate">{p.label}</span>
+            {p.id === "you" && <span className="text-[10px] text-indigo-300 bg-indigo-500/15 px-2 py-0.5 rounded-full">You</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const stageTabs = [
+    { key: "code",   icon: <Code2 className="w-3.5 h-3.5" />,   label: "Code"   },
+    { key: "board",  icon: <PenLine className="w-3.5 h-3.5" />, label: "Board"  },
+    { key: "screen", icon: <ScreenShare className="w-3.5 h-3.5" />, label: "Screen" },
+  ];
 
   return (
-    <div className="h-dvh bg-[#080c18] text-slate-100 flex flex-col overflow-hidden font-sans">
-      <div className="flex-1 min-h-0 flex flex-col p-3 sm:p-4 gap-3">
-        <div className="shrink-0 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shrink-0" />
-            <span className="text-xs font-semibold text-slate-200">Interview</span>
-            <span className="text-xs text-slate-700">•</span>
-            <span className="text-xs font-mono text-slate-400 truncate">{roomCode}</span>
+    <div className="h-dvh bg-[#0f1117] text-slate-100 flex flex-col overflow-hidden font-sans">
+
+      {/* Permission error banner */}
+      {mediaError && (
+        <div className="shrink-0 bg-red-500/15 border-b border-red-500/30 px-4 py-2 flex items-center gap-3">
+          <span className="text-xs text-red-300 flex-1">
+            {mediaError === "NotAllowedError" || mediaError === "PermissionDeniedError"
+              ? "📵 Camera/mic blocked. Click the lock icon in your browser address bar and allow permissions, then refresh."
+              : `⚠️ Media error: ${mediaError}. Try refreshing.`}
+          </span>
+          <button onClick={() => window.location.reload()}
+            className="shrink-0 text-xs font-semibold text-red-200 bg-red-500/20 hover:bg-red-500/30 px-3 py-1 rounded-lg transition">
+            Refresh
+          </button>
+        </div>
+      )}
+
+      {/* Top bar */}
+      <header className="shrink-0 h-12 px-4 flex items-center justify-between gap-3 border-b border-white/5 bg-[#0a0c14]">
+        <div className="flex items-center gap-2 min-w-0">
+          <button onClick={() => router.push("/mock")} className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 lg:hidden">
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shrink-0" />
+          <span className="font-mono text-xs text-slate-400 truncate max-w-[120px] sm:max-w-xs">{roomCode}</span>
+          <span className="text-[10px] bg-white/5 border border-white/8 text-slate-500 px-2 py-0.5 rounded-full shrink-0">
+            {total} {total === 1 ? "person" : "people"}
+          </span>
+        </div>
+        <button onClick={copyLink}
+          className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-200 text-xs font-semibold transition shrink-0">
+          {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+          <span className="hidden sm:inline">{copied ? "Copied!" : "Invite"}</span>
+        </button>
+      </header>
+
+      {/* Body */}
+      <div className="flex-1 min-h-0 flex overflow-hidden">
+
+        {/* ══ MOBILE ══ */}
+        <div className="flex flex-col flex-1 min-h-0 lg:hidden">
+          <div className="flex-1 min-h-0 overflow-hidden relative">
+            <div className={mobileTab === "video"  ? "h-full" : "hidden"}><VideoGrid participants={participants} /></div>
+            <div className={mobileTab === "code"   ? "h-full" : "hidden"}><CodeEditorPanel onBroadcast={handleBroadcast} syncEvent={syncEvent} /></div>
+            <div className={mobileTab === "board"  ? "h-full" : "hidden"}><WhiteboardCanvas onBroadcast={handleBroadcast} syncEvent={syncEvent} /></div>
+            <div className={mobileTab === "chat"   ? "h-full" : "hidden"}>{ChatPanel}</div>
+            <div className={mobileTab === "people" ? "h-full" : "hidden"}>{PeoplePanel}</div>
           </div>
 
-          <button
-            type="button"
-            onClick={copyLink}
-              className="h-9 px-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition text-slate-200 text-xs font-semibold flex items-center gap-2"
-              title="Copy invite link"
-            >
-              {copied ? <Check className="w-4 h-4 text-green-300" /> : <Copy className="w-4 h-4 text-slate-300" />}
-              <span className="hidden sm:inline">{copied ? "Copied" : "Invite"}</span>
-            </button>
-          </div>
-
-        <div className="flex-1 min-h-0">
-          {isStageView ? (
-            <div className="h-full min-h-0 flex flex-col md:flex-row gap-3">
-              <div className="flex-1 min-h-0">
-                {stageMode === "whiteboard" || stageMode === "code" ? (
-                  <DockPanel
-                    mode={stageMode}
-                    onClose={() => setStage(null)}
-                    onSwitch={setStage}
-                  />
-                ) : (
-                  <StageShell
-                    title={screenStream ? "Presenting your screen" : "Stage"}
-                    subtitle={screenStream ? "Your screen is shared with everyone" : "No screen share active"}
-                    icon={<ScreenShare className="w-4 h-4 text-indigo-200" />}
-                    onClose={screenStream ? toggleScreen : () => setStage(null)}
-                  >
-                    <div className="h-full min-h-0 p-3">
-                      <VideoTile
-                        stream={screenStream}
-                        label={screenStream ? "You (presenting)" : "Screen share"}
-                        muted
-                        noVideo={!screenStream}
-                        badge={screenStream ? { icon: <ScreenShare className="w-3.5 h-3.5" />, text: "Sharing" } : null}
-                        className="h-full aspect-auto"
-                      />
-                    </div>
-                  </StageShell>
-                )}
-              </div>
-
-              <aside className="md:w-[320px] md:max-w-[38vw] shrink-0 min-h-0">
-                <div className="h-full min-h-0 rounded-3xl overflow-hidden bg-[#0d1225] border border-white/10 shadow-2xl flex flex-col">
-                  <div className="shrink-0 h-12 px-3 flex items-center justify-between gap-2 border-b border-white/5 bg-[#0d1225]/80 backdrop-blur">
-                    <div className="flex items-center gap-1 p-1 rounded-2xl bg-white/5 border border-white/10">
-                      <button
-                        type="button"
-                        onClick={() => setChatOpen(false)}
-                        className={`h-9 px-3 rounded-xl text-xs font-semibold transition ${
-                          !chatOpen ? "bg-indigo-600 text-white" : "text-slate-300 hover:bg-white/5"
-                        }`}
-                        title="Participants"
-                      >
-                        People
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setChatUnread(0);
-                          setChatOpen(true);
-                        }}
-                        className={`h-9 px-3 rounded-xl text-xs font-semibold transition flex items-center gap-2 ${
-                          chatOpen ? "bg-indigo-600 text-white" : "text-slate-300 hover:bg-white/5"
-                        }`}
-                        title="Chat"
-                      >
-                        <MessageSquare className="w-4 h-4" />
-                        Chat
-                        {chatUnread > 0 ? (
-                          <span className="ml-1 inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-red-500/20 text-red-200 text-[11px] font-bold tabular-nums">
-                            {chatUnread}
-                          </span>
-                        ) : null}
-                      </button>
-                    </div>
-
-                    <div className="text-[11px] text-slate-500 tabular-nums">{filmstripTiles.length}</div>
-                  </div>
-
-                  <div className="flex-1 min-h-0 p-3">
-                    {chatOpen ? (
-                      <div className="h-full min-h-0 flex flex-col">
-                        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide space-y-2 pr-1">
-                          {chatMessages.length === 0 ? (
-                            <div className="h-full min-h-0 flex items-center justify-center text-xs text-slate-500">
-                              No messages yet
-                            </div>
-                          ) : (
-                            chatMessages.map((m) => {
-                              const mine = m.from === clientId;
-                              return (
-                                <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                                  <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs leading-relaxed border ${
-                                    mine
-                                      ? "bg-indigo-600/15 border-indigo-500/25 text-indigo-50"
-                                      : "bg-white/5 border-white/10 text-slate-200"
-                                  }`}>
-                                    {m.text}
-                                  </div>
-                                </div>
-                              );
-                            })
-                          )}
-                        </div>
-                        <form
-                          className="shrink-0 pt-3"
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            sendChat();
-                          }}
-                        >
-                          <div className="flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-3 py-2">
-                            <input
-                              value={chatDraft}
-                              onChange={(e) => setChatDraft(e.target.value)}
-                              placeholder="Send a message"
-                              className="flex-1 bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
-                              aria-label="Chat message"
-                            />
-                            <button
-                              type="submit"
-                              disabled={!chatDraft.trim()}
-                              className={`h-9 px-3 rounded-xl text-xs font-semibold transition ${
-                                chatDraft.trim()
-                                  ? "bg-indigo-600 text-white hover:bg-indigo-500"
-                                  : "bg-white/5 text-slate-500 cursor-not-allowed"
-                              }`}
-                              title="Send"
-                            >
-                              Send
-                            </button>
-                          </div>
-                        </form>
-                      </div>
-                    ) : (
-                      <div className="h-full min-h-0 flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto scrollbar-hide">
-                        {filmstripTiles.map((p) => (
-                          <div key={p.id} className="flex-none w-[280px] md:w-full">
-                            <VideoTile
-                              stream={p.stream}
-                              label={p.label}
-                              muted={p.muted}
-                              noVideo={p.noVideo}
-                              badge={p.badge}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </aside>
+          {/* Mobile bottom bar */}
+          <div className="shrink-0 bg-[#0a0c14] border-t border-white/5 px-2 pt-2 pb-safe">
+            <div className="flex items-center justify-around mb-2">
+              {[
+                { key: "video",  icon: Video,          label: "Video"  },
+                { key: "code",   icon: Code2,           label: "Code"   },
+                { key: "board",  icon: PenLine,         label: "Board"  },
+                { key: "chat",   icon: MessageSquare,   label: "Chat",  badge: chatUnread },
+                { key: "people", icon: Users,           label: "People" },
+              ].map(({ key, icon: Icon, label, badge }) => (
+                <button key={key} onClick={() => { setMobileTab(key); if (key === "chat") setChatUnread(0); }}
+                  className={`relative flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition
+                    ${mobileTab === key ? "text-indigo-400" : "text-slate-500"}`}>
+                  <Icon className="w-5 h-5" />
+                  <span className="text-[9px] font-medium">{label}</span>
+                  {badge > 0 && (
+                    <span className="absolute top-0 right-1 w-4 h-4 rounded-full bg-red-500 text-[8px] font-bold text-white flex items-center justify-center">
+                      {badge > 9 ? "9+" : badge}
+                    </span>
+                  )}
+                </button>
+              ))}
             </div>
-          ) : (
-            <div className="h-full min-h-0 flex flex-col md:flex-row gap-3">
-              <div className="flex-1 min-h-0">
-                <div
-                  className="h-full min-h-0 grid gap-3 place-content-start"
-                  style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))" }}
-                >
-                  {gridTiles.map((p) => (
-                    <VideoTile
-                      key={p.id}
-                      stream={p.stream}
-                      label={p.label}
-                      muted={p.muted}
-                      noVideo={p.noVideo}
-                      badge={p.badge}
-                    />
+            <div className="flex items-center justify-center gap-5 py-2 border-t border-white/5">
+              <IconBtn onClick={toggleMic} icon={micOn ? Mic : MicOff} active={micOn} danger={!micOn} label={micOn ? "Mute" : "Unmute"} />
+              <IconBtn onClick={toggleCam} icon={camOn ? Video : VideoOff} active={camOn} danger={!camOn} label={camOn ? "Cam off" : "Cam on"} />
+              <button onClick={endCall}
+                className="flex items-center gap-2 h-11 px-5 rounded-full bg-red-600 hover:bg-red-500 transition text-white font-semibold text-sm">
+                <PhoneOff className="w-4 h-4" /> End
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ══ DESKTOP ══ */}
+        <div className="hidden lg:flex flex-1 min-h-0 overflow-hidden">
+          {/* Videos (shrinks to filmstrip when stage open) */}
+          <div className={`flex flex-col min-h-0 shrink-0 transition-all duration-300 ${desktopStage ? "w-56" : "flex-1"}`}>
+            <VideoGrid participants={participants} filmstrip={!!desktopStage} />
+          </div>
+
+          {/* Stage */}
+          {desktopStage && (
+            <div className="flex-1 min-h-0 border-l border-white/5 flex flex-col overflow-hidden">
+              <div className="shrink-0 h-11 px-3 flex items-center gap-2 border-b border-white/5 bg-[#0a0c14]">
+                <div className="flex items-center bg-white/5 rounded-lg p-0.5 gap-0.5">
+                  {stageTabs.map(({ key, icon, label }) => (
+                    <button key={key} onClick={() => setDesktopStage(key)}
+                      className={`flex items-center gap-1.5 px-3 h-7 rounded-md text-xs font-semibold transition
+                        ${desktopStage === key ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-slate-200"}`}>
+                      {icon}{label}
+                    </button>
                   ))}
                 </div>
+                <button onClick={() => setDesktopStage(null)}
+                  className="ml-auto w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400">
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-
-              {chatOpen ? (
-                <aside className="md:w-[320px] md:max-w-[38vw] shrink-0 min-h-0">
-                  <div className="h-full min-h-0 rounded-3xl overflow-hidden bg-[#0d1225] border border-white/10 shadow-2xl flex flex-col">
-                    <div className="shrink-0 h-12 px-3 flex items-center justify-between gap-2 border-b border-white/5 bg-[#0d1225]/80 backdrop-blur">
-                      <div className="text-xs font-semibold text-slate-200 flex items-center gap-2">
-                        <MessageSquare className="w-4 h-4 text-slate-300" />
-                        Chat
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setChatOpen(false)}
-                        className="h-9 w-9 rounded-xl hover:bg-white/5 text-slate-300 transition flex items-center justify-center"
-                        aria-label="Close chat"
-                        title="Close"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="flex-1 min-h-0 p-3 flex flex-col">
-                      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide space-y-2 pr-1">
-                        {chatMessages.length === 0 ? (
-                          <div className="h-full min-h-0 flex items-center justify-center text-xs text-slate-500">
-                            No messages yet
-                          </div>
-                        ) : (
-                          chatMessages.map((m) => {
-                            const mine = m.from === clientId;
-                            return (
-                              <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                                <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs leading-relaxed border ${
-                                  mine
-                                    ? "bg-indigo-600/15 border-indigo-500/25 text-indigo-50"
-                                    : "bg-white/5 border-white/10 text-slate-200"
-                                }`}>
-                                  {m.text}
-                                </div>
-                              </div>
-                            );
-                          })
-                        )}
-                      </div>
-                      <form
-                        className="shrink-0 pt-3"
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          sendChat();
-                        }}
-                      >
-                        <div className="flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-3 py-2">
-                          <input
-                            value={chatDraft}
-                            onChange={(e) => setChatDraft(e.target.value)}
-                            placeholder="Send a message"
-                            className="flex-1 bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
-                            aria-label="Chat message"
-                          />
-                          <button
-                            type="submit"
-                            disabled={!chatDraft.trim()}
-                            className={`h-9 px-3 rounded-xl text-xs font-semibold transition ${
-                              chatDraft.trim()
-                                ? "bg-indigo-600 text-white hover:bg-indigo-500"
-                                : "bg-white/5 text-slate-500 cursor-not-allowed"
-                            }`}
-                            title="Send"
-                          >
-                            Send
-                          </button>
-                        </div>
-                      </form>
-                    </div>
+              <div className="flex-1 min-h-0 overflow-hidden">
+                {desktopStage === "code"   && <CodeEditorPanel onBroadcast={handleBroadcast} syncEvent={syncEvent} />}
+                {desktopStage === "board"  && <WhiteboardCanvas onBroadcast={handleBroadcast} syncEvent={syncEvent} />}
+                {desktopStage === "screen" && (
+                  <div className="h-full p-3">
+                    <VideoTile stream={screenStream} label="Your screen" muted noVideo={!screenStream} />
                   </div>
-                </aside>
-              ) : null}
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Chat */}
+          {chatOpen && (
+            <div className="w-72 shrink-0 border-l border-white/5 flex flex-col min-h-0">
+              {ChatPanel}
             </div>
           )}
         </div>
       </div>
 
-      <footer className="shrink-0 px-3 sm:px-4 pb-3">
-        <div className="max-w-3xl mx-auto rounded-3xl bg-[#0d1225]/80 backdrop-blur border border-white/10 px-4 py-3 flex items-center justify-center gap-2">
-          <ControlBtn
-            onClick={toggleMic}
-            icon={micOn ? Mic : MicOff}
-            active={micOn}
-            danger={!micOn}
-            label={micOn ? "Mute microphone" : "Unmute microphone"}
-          />
-          <ControlBtn
-            onClick={toggleCam}
-            icon={camOn ? Video : VideoOff}
-            active={camOn}
-            danger={!camOn}
-            label={camOn ? "Turn off camera" : "Turn on camera"}
-          />
-          <ControlBtn
-            onClick={toggleScreen}
-            icon={screenStream ? ScreenShareOff : ScreenShare}
-            active={!!screenStream}
-            danger={false}
-            label={screenStream ? "Stop sharing screen" : "Share screen"}
-          />
-          <ControlBtn
-            onClick={() => toggleStage("whiteboard")}
-            icon={PenLine}
-            active={stageMode === "whiteboard"}
-            danger={false}
-            label="Open whiteboard"
-          />
-          <ControlBtn
-            onClick={() => toggleStage("code")}
-            icon={Code2}
-            active={stageMode === "code"}
-            danger={false}
-            label="Open code editor"
-          />
-          <ControlBtn
-            onClick={() =>
-              setChatOpen((v) => {
-                const next = !v;
-                if (next) setChatUnread(0);
-                return next;
-              })
-            }
-            icon={MessageSquare}
-            active={chatOpen}
-            danger={false}
-            label="Open chat"
-          />
-
-          <button
-            type="button"
-            onClick={endCall}
-            className="ml-2 h-12 px-5 rounded-full bg-red-600 hover:bg-red-500 transition text-white font-semibold flex items-center gap-2 shadow-[0_0_16px_rgba(239,68,68,0.35)]"
-            title="End call"
-            aria-label="End call"
-          >
-            <PhoneOff className="w-5 h-5" />
-            <span className="hidden sm:inline">End</span>
+      {/* Desktop bottom bar */}
+      <footer className="hidden lg:flex shrink-0 bg-[#0a0c14] border-t border-white/5 px-6 py-3">
+        <div className="max-w-2xl mx-auto w-full flex items-end justify-between">
+          <div className="flex items-end gap-4">
+            <IconBtn onClick={toggleMic} icon={micOn ? Mic : MicOff} active={micOn} danger={!micOn} label={micOn ? "Mute" : "Unmute"} />
+            <IconBtn onClick={toggleCam} icon={camOn ? Video : VideoOff} active={camOn} danger={!camOn} label={camOn ? "Cam off" : "Cam on"} />
+            <IconBtn onClick={toggleScreen} icon={screenStream ? ScreenShareOff : ScreenShare} active={!!screenStream} label="Screen" />
+          </div>
+          <div className="flex items-end gap-4">
+            <IconBtn onClick={() => setDesktopStage(s => s === "code"  ? null : "code")}  icon={Code2}   active={desktopStage === "code"}  label="Code" />
+            <IconBtn onClick={() => setDesktopStage(s => s === "board" ? null : "board")} icon={PenLine} active={desktopStage === "board"} label="Board" />
+            <IconBtn onClick={() => { setChatOpen(v => { if (!v) setChatUnread(0); return !v; }); }}
+              icon={MessageSquare} active={chatOpen} badge={chatUnread} label="Chat" />
+          </div>
+          <button onClick={endCall}
+            className="flex items-center gap-2 h-12 px-6 rounded-full bg-red-600 hover:bg-red-500 transition text-white font-semibold shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+            <PhoneOff className="w-5 h-5" /><span className="text-sm">End call</span>
           </button>
         </div>
       </footer>

@@ -36,9 +36,9 @@ export default function RoadmapLevelPage({ params }) {
     </div>
   );
 
-  const levelProblems = PROBLEMS.filter(p => lvl.problemIds.includes(p.id));
+  const levelProblems = lvl.problems ?? [];
   const solvedCount   = levelProblems.filter(p => p.solved).length;
-  const progress      = lvl.problemIds.length > 0 ? (solvedCount / lvl.problemIds.length) * 100 : 0;
+  const progress      = levelProblems.length > 0 ? (solvedCount / levelProblems.length) * 100 : 0;
 
   const stateColor = lvl.active
     ? { ring: `rgb(${lvl.color})`, glow: `rgba(${lvl.color},0.3)` }
@@ -121,7 +121,7 @@ export default function RoadmapLevelPage({ params }) {
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className="text-lg font-extrabold" style={{ color: `rgb(${lvl.color})` }}>{solvedCount}</span>
-                      <span className="text-[10px] text-slate-500">/{lvl.problemIds.length}</span>
+                      <span className="text-[10px] text-slate-500">/{levelProblems.length}</span>
                     </div>
                   </div>
                   <div>
@@ -132,9 +132,9 @@ export default function RoadmapLevelPage({ params }) {
               </div>
 
               {/* Topic pills */}
-              {lvl.topics.length > 0 && (
+              {(lvl.topics ?? []).length > 0 && (
                 <div className="relative flex flex-wrap gap-2 mt-5">
-                  {lvl.topics.map(t => (
+                  {(lvl.topics ?? []).map(t => (
                     <span key={t} className="text-xs px-3 py-1.5 rounded-full font-medium"
                       style={{ background: `rgba(${lvl.color},0.15)`, color: `rgb(${lvl.color})` }}>
                       {t}
@@ -145,14 +145,14 @@ export default function RoadmapLevelPage({ params }) {
             </div>
 
             {/* Theory section */}
-            {lvl.theory.length > 0 && (
+            {(lvl.theory ?? []).length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <BookOpen className="w-4 h-4 text-indigo-400" />
                   <h2 className="text-base font-bold">Theory</h2>
                 </div>
                 <div className="space-y-2">
-                  {lvl.theory.map((t, i) => (
+                  {(lvl.theory ?? []).map((t, i) => (
                     <div key={i} className="rounded-2xl bg-[#0d1225] border border-indigo-500/15 overflow-hidden">
                       <button
                         onClick={() => setOpenTheory(openTheory === i ? null : i)}
@@ -215,7 +215,7 @@ export default function RoadmapLevelPage({ params }) {
                 <div className="text-xs text-slate-400">
                   {progress === 100
                     ? "You've mastered this level. Move to the next one!"
-                    : `Solve ${lvl.problemIds.length - solvedCount} more problem${lvl.problemIds.length - solvedCount !== 1 ? "s" : ""} to complete this level.`}
+                    : `Solve ${levelProblems.length - solvedCount} more problem${levelProblems.length - solvedCount !== 1 ? "s" : ""} to complete this level.`}
                 </div>
               </div>
               <Link href="/dashboard"
